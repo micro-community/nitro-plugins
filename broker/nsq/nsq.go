@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/micro/go-micro/broker"
-	"github.com/micro/go-micro/codec/json"
-	"github.com/micro/go-micro/config/cmd"
+	"github.com/micro/go-micro/v2/broker"
+	"github.com/micro/go-micro/v2/codec/json"
+	"github.com/micro/go-micro/v2/config/cmd"
 	"github.com/nsqio/go-nsq"
 )
 
@@ -31,6 +31,7 @@ type publication struct {
 	m     *broker.Message
 	nm    *nsq.Message
 	opts  broker.PublishOptions
+	err   error
 }
 
 type subscriber struct {
@@ -265,11 +266,9 @@ func (n *nsqBroker) Subscribe(topic string, handler broker.Handler, opts ...brok
 			return err
 		}
 
-		return handler(&publication{
-			topic: topic,
-			m:     &m,
-			nm:    nm,
-		})
+		p := &publication{topic: topic, m: &m}
+		p.err = handler(p)
+		return p.err
 	})
 
 	c.AddConcurrentHandlers(h, concurrency)
@@ -311,6 +310,10 @@ func (p *publication) Message() *broker.Message {
 func (p *publication) Ack() error {
 	p.nm.Finish()
 	return nil
+}
+
+func (p *publication) Error() error {
+	return p.err
 }
 
 func (s *subscriber) Options() broker.SubscribeOptions {

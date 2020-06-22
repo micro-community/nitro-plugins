@@ -1,12 +1,13 @@
 package proxy
 
 import (
-	"github.com/micro/go-micro/broker"
+	"github.com/micro/go-micro/v2/broker"
 )
 
 type publication struct {
 	topic   string
 	message *broker.Message
+	err     error
 }
 
 func (p *publication) Topic() string {
@@ -19,4 +20,8 @@ func (p *publication) Message() *broker.Message {
 
 func (p *publication) Ack() error {
 	return nil
+}
+
+func (p *publication) Error() error {
+	return p.err
 }

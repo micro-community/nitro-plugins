@@ -1,14 +1,15 @@
 package mqtt
 
 import (
-	"github.com/eclipse/paho.mqtt.golang"
-	"github.com/micro/go-micro/broker"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/micro/go-micro/v2/broker"
 )
 
 // mqttPub is a broker.Event
 type mqttPub struct {
 	topic string
 	msg   *broker.Message
+	err   error
 }
 
 // mqttPub is a broker.Subscriber
@@ -20,6 +21,10 @@ type mqttSub struct {
 
 func (m *mqttPub) Ack() error {
 	return nil
+}
+
+func (m *mqttPub) Error() error {
+	return m.err
 }
 
 func (m *mqttPub) Topic() string {

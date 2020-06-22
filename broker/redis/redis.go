@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/gomodule/redigo/redis"
-	"github.com/micro/go-micro/broker"
-	"github.com/micro/go-micro/codec"
-	"github.com/micro/go-micro/codec/json"
-	"github.com/micro/go-micro/config/cmd"
+	"github.com/micro/go-micro/v2/broker"
+	"github.com/micro/go-micro/v2/codec"
+	"github.com/micro/go-micro/v2/codec/json"
+	"github.com/micro/go-micro/v2/config/cmd"
 )
 
 func init() {
@@ -22,6 +22,7 @@ func init() {
 type publication struct {
 	topic   string
 	message *broker.Message
+	err     error
 }
 
 // Topic returns the topic this publication applies to.
@@ -38,6 +39,10 @@ func (p *publication) Message() *broker.Message {
 // is Redis and therefore this is a no-op.
 func (p *publication) Ack() error {
 	return nil
+}
+
+func (p *publication) Error() error {
+	return p.err
 }
 
 // subscriber proxies and handles Redis messages as broker publications.
@@ -72,7 +77,7 @@ func (s *subscriber) recv() {
 			}
 
 			// Handle error? Retry?
-			if err := s.handle(&p); err != nil {
+			if p.err = s.handle(&p); p.err != nil {
 				break
 			}
 

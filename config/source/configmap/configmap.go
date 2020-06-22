@@ -4,7 +4,7 @@ package configmap
 import (
 	"fmt"
 
-	"github.com/micro/go-micro/config/source"
+	"github.com/micro/go-micro/v2/config/source"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 )
@@ -51,6 +51,11 @@ func (k *configmap) Read() (*source.ChangeSet, error) {
 	cs.Checksum = cs.Sum()
 
 	return cs, nil
+}
+
+// Write is unsupported
+func (k *configmap) Write(cs *source.ChangeSet) error {
+	return nil
 }
 
 func (k *configmap) String() string {

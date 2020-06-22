@@ -3,6 +3,7 @@ package snssqs
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"sync"
 	"time"
 	"unicode"
@@ -15,18 +16,19 @@ import (
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/aws/aws-sdk-go/service/sts"
-	"github.com/micro/go-micro/broker"
-	"github.com/micro/go-micro/config/cmd"
-	"github.com/micro/go-micro/util/log"
+	"github.com/micro/go-micro/v2/broker"
+	"github.com/micro/go-micro/v2/config/cmd"
+	"github.com/micro/go-micro/v2/logger"
 )
 
 type sessClientKey struct{}
 
 const (
-	defaultMaxMessages       = 1
-	defaultVisibilityTimeout = 3
-	defaultWaitSeconds       = 10
-	defaultValidateOnPublish = false
+	defaultMaxMessages             = 1
+	defaultVisibilityTimeout       = 3
+	defaultWaitSeconds             = 10
+	defaultValidateOnPublish       = false
+	defaultValidateHeaderOnPublish = false
 )
 
 // Amazon Services
@@ -54,6 +56,7 @@ type sqsEvent struct {
 	m         *broker.Message
 	URL       string
 	queueName string
+	err       error
 }
 
 func init() {
@@ -63,7 +66,8 @@ func init() {
 // run is designed to run as a goroutine and poll SQS for new messages. Note that it's possible to receive
 // more than one message from a single poll depending on the options configured for the plugin
 func (s *subscriber) run(hdlr broker.Handler) {
-	log.Logf("SQS subscription started. Queue:%s, URL: %s", s.queueName, s.URL)
+	logger.Debugf("SQS subscription started. Queue:%s, URL: %s", s.queueName, s.URL)
+
 	for {
 		select {
 		case <-s.exit:
@@ -84,7 +88,7 @@ func (s *subscriber) run(hdlr broker.Handler) {
 
 			if err != nil {
 				time.Sleep(time.Second)
-				log.Logf("Error receiving SQS message: %s", err.Error())
+				logger.Errorf("Error receiving SQS message: %s", err.Error())
 				continue
 			}
 
@@ -125,7 +129,7 @@ func (s *subscriber) getWaitSeconds() *int64 {
 }
 
 func (s *subscriber) handleMessage(msg *sqs.Message, hdlr broker.Handler) {
-	log.Logf("Received SQS message: %d bytes", len(*msg.Body))
+	logger.Debugf("Received SQS message: %d bytes", len(*msg.Body))
 	m := &broker.Message{
 		Header: buildMessageHeader(msg.MessageAttributes),
 		Body:   []byte(*msg.Body),
@@ -139,13 +143,13 @@ func (s *subscriber) handleMessage(msg *sqs.Message, hdlr broker.Handler) {
 		svc:       s.svc,
 	}
 
-	if err := hdlr(p); err != nil {
-		fmt.Println(err)
+	if p.err = hdlr(p); p.err != nil {
+		fmt.Println(p.err)
 	}
 	if s.options.AutoAck {
 		err := p.Ack()
 		if err != nil {
-			log.Logf("Failed auto-acknowledge of message: %s", err.Error())
+			logger.Errorf("Failed auto-acknowledge of message: %s", err.Error())
 		}
 	}
 }
@@ -166,6 +170,10 @@ func (s *subscriber) Unsubscribe() error {
 		close(s.exit)
 		return nil
 	}
+}
+
+func (p *sqsEvent) Error() error {
+	return p.err
 }
 
 func (p *sqsEvent) Ack() error {
@@ -238,61 +246,6 @@ func (b *awsServices) Init(opts ...broker.Option) error {
 	return nil
 }
 
-// Validate message for the lowest requirements of both SNS and SQS
-func Validate(msg *broker.Message) error {
-	// Not sure whether there are any constraints on the headers
-	// ignore them for now
-
-	// SNS requirements
-	if len(msg.Body) > 256*1024 {
-		return fmt.Errorf("message body over 256kB bytes")
-	}
-	if !utf8.Valid(msg.Body) {
-		return fmt.Errorf("message body does not consist solely of UTF-8 characters")
-	}
-
-	// SQS Requirements
-	// Only accept the following unicode ranges:
-	// #x9 | #xA | #xD | #x20 to #xD7FF | #xE000 to #xFFFD | #x10000 to #x10FFFF
-
-	numWorkers := 8
-	runeCh := make(chan rune)
-	var err error
-	waitGroup := sync.WaitGroup{}
-
-	for i := 0; i < numWorkers; i++ {
-		waitGroup.Add(1)
-		go func(wg *sync.WaitGroup, rCh <-chan rune, err *error) {
-			defer wg.Done()
-			for r := range rCh {
-				if !unicode.In(r, validSqsRunes) {
-					*err = fmt.Errorf("message body contains invalid UTF-8 characters for SQS messages")
-				}
-			}
-		}(&waitGroup, runeCh, &err)
-	}
-
-	for _, r := range string(msg.Body) {
-		if err != nil {
-			close(runeCh)
-			return err
-		}
-		runeCh <- r
-	}
-	close(runeCh)
-	waitGroup.Wait()
-
-	return err
-}
-
-func (b *awsServices) getValidateOnPublish() bool {
-	if v := b.options.Context.Value(validateOnPublishKey{}); v != nil {
-		v2 := v.(bool)
-		return v2
-	}
-	return defaultValidateOnPublish
-}
-
 // Publish publishes a message via SNS
 func (b *awsServices) Publish(topic string, msg *broker.Message, opts ...broker.PublishOption) error {
 
@@ -301,11 +254,15 @@ func (b *awsServices) Publish(topic string, msg *broker.Message, opts ...broker.
 		o(&options)
 	}
 
-	if options.Context != nil {
-		if b.getValidateOnPublish() {
-			if err := Validate(msg); err != nil {
-				return err
-			}
+	if getValidateOnPublish(options.Context) {
+		if err := ValidateBody(msg); err != nil {
+			return err
+		}
+	}
+
+	if getValidateHeaderOnPublish(options.Context) {
+		if err := ValidateHeader(msg, getHeaderWhitelistOnPublish(options.Context)); err != nil {
+			return err
 		}
 	}
 
@@ -321,9 +278,9 @@ func (b *awsServices) Publish(topic string, msg *broker.Message, opts ...broker.
 		Message:  aws.String(string(msg.Body[:])),
 		TopicArn: &topicArn,
 	}
-	input.MessageAttributes = copyMessageHeader(msg)
+	input.MessageAttributes = copyMessageHeader(options.Context, msg)
 
-	log.Logf("Publishing SNS message, %d bytes", len(msg.Body))
+	logger.Debugf("Publishing SNS message to %s, %d bytes", topic, len(msg.Body))
 	if _, err := b.svcSns.Publish(input); err != nil {
 		return err
 	}
@@ -379,26 +336,6 @@ func (b *awsServices) String() string {
 	return "snssqs"
 }
 
-func copyMessageHeader(m *broker.Message) (attribs map[string]*sns.MessageAttributeValue) {
-	attribs = make(map[string]*sns.MessageAttributeValue)
-	for k, v := range m.Header {
-		attribs[k] = &sns.MessageAttributeValue{
-			DataType:    aws.String("String"),
-			StringValue: aws.String(v),
-		}
-	}
-	return attribs
-}
-
-func buildMessageHeader(attribs map[string]*sqs.MessageAttributeValue) map[string]string {
-	res := make(map[string]string)
-
-	for k, v := range attribs {
-		res[k] = *v.StringValue
-	}
-	return res
-}
-
 func (b *awsServices) getAwsClient() *session.Session {
 	raw := b.options.Context.Value(sessClientKey{})
 	if raw != nil {
@@ -445,4 +382,143 @@ func NewBroker(opts ...broker.Option) broker.Broker {
 	return &awsServices{
 		options: options,
 	}
+}
+
+func copyMessageHeader(ctx context.Context, m *broker.Message) (attribs map[string]*sns.MessageAttributeValue) {
+	headerWhitelistOnPublish := getHeaderWhitelistOnPublish(ctx)
+
+	attribs = make(map[string]*sns.MessageAttributeValue)
+	for k, v := range m.Header {
+		if headerWhitelistOnPublish != nil {
+			if _, ok := headerWhitelistOnPublish[k]; !ok {
+				logger.Debugf("header not whitelisted, removing: %s", k)
+				continue
+			}
+		}
+
+		attribs[k] = &sns.MessageAttributeValue{
+			DataType:    aws.String("String"),
+			StringValue: aws.String(v),
+		}
+	}
+	return attribs
+}
+
+func buildMessageHeader(attribs map[string]*sqs.MessageAttributeValue) map[string]string {
+	res := make(map[string]string)
+
+	for k, v := range attribs {
+		res[k] = *v.StringValue
+	}
+	return res
+}
+
+// ValidateBody Validate message for the lowest requirements of both SNS and SQS
+func ValidateBody(msg *broker.Message) error {
+	// SNS requirements
+	if len(msg.Body) > 256*1024 {
+		return fmt.Errorf("message body over 256kB bytes")
+	}
+	if !utf8.Valid(msg.Body) {
+		return fmt.Errorf("message body does not consist solely of UTF-8 characters")
+	}
+
+	// SQS Requirements
+	// Only accept the following unicode ranges:
+	// #x9 | #xA | #xD | #x20 to #xD7FF | #xE000 to #xFFFD | #x10000 to #x10FFFF
+
+	numWorkers := 8
+	runeCh := make(chan rune)
+	var err error
+	waitGroup := sync.WaitGroup{}
+
+	for i := 0; i < numWorkers; i++ {
+		waitGroup.Add(1)
+		go func(wg *sync.WaitGroup, rCh <-chan rune, err *error) {
+			defer wg.Done()
+			for r := range rCh {
+				if !unicode.In(r, validSqsRunes) {
+					*err = fmt.Errorf("message body contains invalid UTF-8 characters for SQS messages")
+				}
+			}
+		}(&waitGroup, runeCh, &err)
+	}
+
+	for _, r := range string(msg.Body) {
+		if err != nil {
+			close(runeCh)
+			return err
+		}
+		runeCh <- r
+	}
+	close(runeCh)
+	waitGroup.Wait()
+
+	return err
+}
+
+func ValidateHeader(msg *broker.Message, whitelist map[string]struct{}) error {
+	// SNS Requirement
+	// can only have a max of 10 headers (converted to attributes) or silently fails
+	if len(msg.Header) > 10 && (whitelist == nil || len(whitelist) > 10) {
+		totalHeaders := len(msg.Header)
+		if whitelist != nil {
+			totalHeaders = 0
+			for k := range msg.Header {
+				if _, ok := whitelist[k]; ok {
+					totalHeaders++
+				}
+			}
+		}
+		return fmt.Errorf("too many headers %d (max 10)", totalHeaders)
+	}
+
+	// SNS Requirement
+	// check for allowable characters in header name (A-Z, a-z, 0-9, -, _, .)
+	validSNSAttrName := regexp.MustCompile(`(?i)^[A-Z0-9\-_\.]+$`)
+	for k := range msg.Header {
+		if whitelist != nil {
+			if _, ok := whitelist[k]; !ok {
+				continue
+			}
+		}
+
+		if !validSNSAttrName.MatchString(k) {
+			return fmt.Errorf("invlaid characters in header key %s", k)
+		}
+	}
+
+	return nil
+}
+
+func getValidateOnPublish(ctx context.Context) bool {
+	if ctx == nil {
+		return defaultValidateOnPublish
+	}
+	if v, ok := ctx.Value(validateOnPublishKey{}).(bool); ok && v {
+		return true
+	}
+	// false by default
+	return defaultValidateOnPublish
+}
+
+func getValidateHeaderOnPublish(ctx context.Context) bool {
+	if ctx == nil {
+		return defaultValidateHeaderOnPublish
+	}
+	if v, ok := ctx.Value(validateHeaderOnPublishKey{}).(bool); ok && v {
+		return true
+	}
+	// false by default
+	return defaultValidateHeaderOnPublish
+}
+
+func getHeaderWhitelistOnPublish(ctx context.Context) map[string]struct{} {
+	if ctx == nil {
+		return nil
+	}
+	if v, ok := ctx.Value(headerWhitelistOnPublishKey{}).(map[string]struct{}); ok {
+		return v
+	}
+	return nil
 }

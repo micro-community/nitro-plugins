@@ -5,12 +5,14 @@ import (
 	"fmt"
 
 	"context"
+	"strings"
 
-	"github.com/micro/go-micro/client"
-	"github.com/micro/go-micro/metadata"
-	"github.com/micro/go-micro/registry"
-	"github.com/micro/go-micro/server"
+	"github.com/micro/go-micro/v2/client"
+	"github.com/micro/go-micro/v2/metadata"
+	"github.com/micro/go-micro/v2/registry"
+	"github.com/micro/go-micro/v2/server"
 	opentracing "github.com/opentracing/opentracing-go"
+	opentracinglog "github.com/opentracing/opentracing-go/log"
 )
 
 type otWrapper struct {
@@ -23,11 +25,8 @@ type otWrapper struct {
 func StartSpanFromContext(ctx context.Context, tracer opentracing.Tracer, name string, opts ...opentracing.StartSpanOption) (context.Context, opentracing.Span, error) {
 	md, ok := metadata.FromContext(ctx)
 	if !ok {
-		md = make(map[string]string)
+		md = make(metadata.Metadata)
 	}
-
-	// copy the metadata to prevent race
-	md = metadata.Copy(md)
 
 	// Find parent span.
 	// First try to get span within current service boundary.
@@ -38,10 +37,17 @@ func StartSpanFromContext(ctx context.Context, tracer opentracing.Tracer, name s
 		opts = append(opts, opentracing.ChildOf(spanCtx))
 	}
 
+	// allocate new map with only one element
+	nmd := make(metadata.Metadata, 1)
+
 	sp := tracer.StartSpan(name, opts...)
 
-	if err := sp.Tracer().Inject(sp.Context(), opentracing.TextMap, opentracing.TextMapCarrier(md)); err != nil {
+	if err := sp.Tracer().Inject(sp.Context(), opentracing.TextMap, opentracing.TextMapCarrier(nmd)); err != nil {
 		return nil, nil, err
+	}
+
+	for k, v := range nmd {
+		md.Set(strings.Title(k), v)
 	}
 
 	ctx = opentracing.ContextWithSpan(ctx, sp)
@@ -56,7 +62,11 @@ func (o *otWrapper) Call(ctx context.Context, req client.Request, rsp interface{
 		return err
 	}
 	defer span.Finish()
-	return o.Client.Call(ctx, req, rsp, opts...)
+	if err = o.Client.Call(ctx, req, rsp, opts...); err != nil {
+		span.LogFields(opentracinglog.String("error", err.Error()))
+		span.SetTag("error", true)
+	}
+	return err
 }
 
 func (o *otWrapper) Stream(ctx context.Context, req client.Request, opts ...client.CallOption) (client.Stream, error) {
@@ -66,7 +76,12 @@ func (o *otWrapper) Stream(ctx context.Context, req client.Request, opts ...clie
 		return nil, err
 	}
 	defer span.Finish()
-	return o.Client.Stream(ctx, req, opts...)
+	stream, err := o.Client.Stream(ctx, req, opts...)
+	if err != nil {
+		span.LogFields(opentracinglog.String("error", err.Error()))
+		span.SetTag("error", true)
+	}
+	return stream, err
 }
 
 func (o *otWrapper) Publish(ctx context.Context, p client.Message, opts ...client.PublishOption) error {
@@ -76,7 +91,11 @@ func (o *otWrapper) Publish(ctx context.Context, p client.Message, opts ...clien
 		return err
 	}
 	defer span.Finish()
-	return o.Client.Publish(ctx, p, opts...)
+	if err = o.Client.Publish(ctx, p, opts...); err != nil {
+		span.LogFields(opentracinglog.String("error", err.Error()))
+		span.SetTag("error", true)
+	}
+	return err
 }
 
 // NewClientWrapper accepts an open tracing Trace and returns a Client Wrapper
@@ -102,7 +121,11 @@ func NewCallWrapper(ot opentracing.Tracer) client.CallWrapper {
 				return err
 			}
 			defer span.Finish()
-			return cf(ctx, node, req, rsp, opts)
+			if err = cf(ctx, node, req, rsp, opts); err != nil {
+				span.LogFields(opentracinglog.String("error", err.Error()))
+				span.SetTag("error", true)
+			}
+			return err
 		}
 	}
 }
@@ -120,7 +143,11 @@ func NewHandlerWrapper(ot opentracing.Tracer) server.HandlerWrapper {
 				return err
 			}
 			defer span.Finish()
-			return h(ctx, req, rsp)
+			if err = h(ctx, req, rsp); err != nil {
+				span.LogFields(opentracinglog.String("error", err.Error()))
+				span.SetTag("error", true)
+			}
+			return err
 		}
 	}
 }
@@ -129,7 +156,7 @@ func NewHandlerWrapper(ot opentracing.Tracer) server.HandlerWrapper {
 func NewSubscriberWrapper(ot opentracing.Tracer) server.SubscriberWrapper {
 	return func(next server.SubscriberFunc) server.SubscriberFunc {
 		return func(ctx context.Context, msg server.Message) error {
-			name := "Pub to " + msg.Topic()
+			name := "Sub from " + msg.Topic()
 			if ot == nil {
 				ot = opentracing.GlobalTracer()
 			}
@@ -138,7 +165,11 @@ func NewSubscriberWrapper(ot opentracing.Tracer) server.SubscriberWrapper {
 				return err
 			}
 			defer span.Finish()
-			return next(ctx, msg)
+			if err = next(ctx, msg); err != nil {
+				span.LogFields(opentracinglog.String("error", err.Error()))
+				span.SetTag("error", true)
+			}
+			return err
 		}
 	}
 }

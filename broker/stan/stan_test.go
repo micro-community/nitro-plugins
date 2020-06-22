@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/micro/go-micro/broker"
+	"github.com/micro/go-micro/v2/broker"
 	stan "github.com/nats-io/stan.go"
 )
 
@@ -39,7 +39,7 @@ var addrTestCases = []struct {
 		"default",
 		"check if default Address is set correctly",
 		map[string]string{
-			"nats://localhost:4222": ""},
+			"nats://127.0.0.1:4222": ""},
 	},
 }
 

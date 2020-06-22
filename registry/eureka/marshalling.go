@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/hudl/fargo"
-	"github.com/micro/go-micro/registry"
+	"github.com/micro/go-micro/v2/registry"
 )
 
 func appToService(app *fargo.Application) []*registry.Service {
@@ -48,10 +48,12 @@ func appToService(app *fargo.Application) []*registry.Service {
 			}
 		}
 
+                host, _, _ := net.SplitHostPort(addr)
+
 		// append node
 		service.Nodes = append(service.Nodes, &registry.Node{
 			Id:       id,
-			Address:  fmt.Sprintf("%s:%d", addr, port),
+			Address:  fmt.Sprintf("%s:%d", host, port),
 			Metadata: metadata,
 		})
 

@@ -4,12 +4,12 @@ package metrics
 import (
 	"net/http"
 
-	"github.com/micro/cli"
-	"github.com/micro/go-micro/util/log"
-	"github.com/micro/micro/plugin"
+	"github.com/micro/cli/v2"
+	log "github.com/micro/go-micro/v2/logger"
+	"github.com/micro/micro/v2/plugin"
 
 	// prometheus metrics
-	"github.com/micro/go-plugins/micro/metrics/prometheus"
+	"github.com/micro/go-plugins/micro/metrics/prometheus/v2"
 )
 
 type Metrics struct {
@@ -34,7 +34,7 @@ func NewPlugin() plugin.Plugin {
 	return plugin.NewPlugin(
 		plugin.WithName("metrics"),
 		plugin.WithFlag(
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "metrics",
 				Usage: "Specify the type of metrics provider e.g prometheus",
 			},
@@ -46,7 +46,7 @@ func NewPlugin() plugin.Plugin {
 			switch provider {
 			case "prometheus":
 				metrics.Provider = prometheus.New()
-				log.Log("Loaded prometheus metrics at /metrics")
+				log.Info("Loaded prometheus metrics at /metrics")
 			}
 
 			return nil

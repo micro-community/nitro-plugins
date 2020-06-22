@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/hashicorp/consul/api"
-	"github.com/micro/go-micro/config/source"
+	"github.com/micro/go-micro/v2/config/source"
 )
 
 // Currently a single consul reader
@@ -53,6 +53,11 @@ func (c *consul) Read() (*source.ChangeSet, error) {
 	cs.Checksum = cs.Sum()
 
 	return cs, nil
+}
+
+// Write is unsupported
+func (c *consul) Write(cs *source.ChangeSet) error {
+	return nil
 }
 
 func (c *consul) String() string {

@@ -6,10 +6,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/micro/go-micro/registry"
-	"github.com/micro/go-micro/util/log"
-	"github.com/micro/go-plugins/registry/kubernetes/client"
-	"github.com/micro/go-plugins/registry/kubernetes/client/watch"
+	log "github.com/micro/go-micro/v2/logger"
+	"github.com/micro/go-micro/v2/registry"
+	"github.com/micro/go-plugins/registry/kubernetes/v2/client"
+	"github.com/micro/go-plugins/registry/kubernetes/v2/client/watch"
 )
 
 type k8sWatcher struct {
@@ -131,7 +131,7 @@ func (k *k8sWatcher) buildPodResults(pod *client.Pod, cache *client.Pod) []*regi
 func (k *k8sWatcher) handleEvent(event watch.Event) {
 	var pod client.Pod
 	if err := json.Unmarshal([]byte(event.Object), &pod); err != nil {
-		log.Log("K8s Watcher: Couldnt unmarshal event object from pod")
+		log.Error("K8s Watcher: Couldnt unmarshal event object from pod")
 		return
 	}
 

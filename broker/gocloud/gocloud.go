@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/micro/go-micro/broker"
-	"github.com/micro/go-micro/config/cmd"
+	"github.com/micro/go-micro/v2/broker"
+	"github.com/micro/go-micro/v2/config/cmd"
 	"github.com/streadway/amqp"
 	"gocloud.dev/gcp"
 	"gocloud.dev/pubsub"
@@ -221,6 +221,7 @@ func (s *subscriber) run(ctx context.Context, h broker.Handler) {
 			ack:   m.Ack,
 		}
 		if err := h(p); err != nil {
+			p.err = err
 			log.Printf("handler returned %v; continuing", err)
 			continue
 		}
@@ -235,8 +236,10 @@ type publication struct {
 	msg   *broker.Message
 	topic string
 	ack   func()
+	err   error
 }
 
 func (p *publication) Topic() string            { return p.topic }
 func (p *publication) Message() *broker.Message { return p.msg }
 func (p *publication) Ack() error               { p.ack(); return nil }
+func (p *publication) Error() error             { return p.err }

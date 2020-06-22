@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
-	"github.com/micro/go-micro/registry"
+	"github.com/micro/go-micro/v2/registry"
 )
 
 func encode(buf []byte) string {
@@ -39,6 +39,7 @@ func decode(d string) []byte {
 	if err != nil {
 		return nil
 	}
+	zr.Close()
 
 	return rbuf
 }

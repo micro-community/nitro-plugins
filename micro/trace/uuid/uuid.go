@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	"github.com/micro/cli"
-	"github.com/micro/micro/plugin"
+	"github.com/micro/cli/v2"
+	"github.com/micro/micro/v2/plugin"
 )
 
 type uuidPlugin struct{}
@@ -15,7 +15,7 @@ func (u *uuidPlugin) Flags() []cli.Flag {
 	return nil
 }
 
-func (u *uuidPlugin) Commands() []cli.Command {
+func (u *uuidPlugin) Commands() []*cli.Command {
 	return nil
 }
 

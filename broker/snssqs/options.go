@@ -2,13 +2,11 @@ package snssqs
 
 import (
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/micro/go-micro/broker"
+	"github.com/micro/go-micro/v2/broker"
+	"github.com/micro/go-micro/v2/client"
 )
 
 type maxMessagesKey struct{}
-type sqsConfigKey struct{}
-type snsConfigKey struct{}
-type stsConfigKey struct{}
 
 // MaxReceiveMessages indicates how many messages a receive operation should pull
 // during any single call
@@ -40,16 +38,51 @@ func ValidateOnPublish(validate bool) broker.PublishOption {
 	return setPublishOption(validateOnPublishKey{}, validate)
 }
 
+func ClientValidateOnPublish(validate bool) client.PublishOption {
+	return setClientPublishOption(validateOnPublishKey{}, validate)
+}
+
+type snsConfigKey struct{}
+
 // SNSConfig add AWS config options to the sns client
 func SNSConfig(c *aws.Config) broker.Option {
 	return setBrokerOption(snsConfigKey{}, c)
 }
+
+type sqsConfigKey struct{}
 
 // SQSConfig add AWS config options to the sqs client
 func SQSConfig(c *aws.Config) broker.Option {
 	return setBrokerOption(sqsConfigKey{}, c)
 }
 
+type stsConfigKey struct{}
+
+// STSConfig add AWS config options to the sts client
 func STSConfig(c *aws.Config) broker.Option {
 	return setBrokerOption(stsConfigKey{}, c)
+}
+
+type validateHeaderOnPublishKey struct{}
+
+// ValidateHeaderOnPublish validate headers before sending to sns
+func ValidateHeaderOnPublish(validate bool) broker.PublishOption {
+	return setPublishOption(validateHeaderOnPublishKey{}, validate)
+}
+
+// ClientValidateHeaderOnPublish validate headers before sending to sns
+func ClientValidateHeaderOnPublish(validate bool) client.PublishOption {
+	return setClientPublishOption(validateHeaderOnPublishKey{}, validate)
+}
+
+type headerWhitelistOnPublishKey struct{}
+
+// HeaderWhitelist validate headers before sending to sns
+func HeaderWhitelistOnPublish(whitelist map[string]struct{}) broker.PublishOption {
+	return setPublishOption(headerWhitelistOnPublishKey{}, whitelist)
+}
+
+// ClientHeaderWhitelist validate headers before sending to sns
+func ClientHeaderWhitelistOnPublish(whitelist map[string]struct{}) client.PublishOption {
+	return setClientPublishOption(headerWhitelistOnPublishKey{}, whitelist)
 }

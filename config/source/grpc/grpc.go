@@ -4,8 +4,8 @@ import (
 	"context"
 	"crypto/tls"
 
-	"github.com/micro/go-micro/config/source"
-	proto "github.com/micro/go-plugins/config/source/grpc/proto"
+	"github.com/micro/go-micro/v2/config/source"
+	proto "github.com/micro/go-plugins/config/source/grpc/v2/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -57,6 +57,11 @@ func (g *grpcSource) Watch() (source.Watcher, error) {
 		return nil, err
 	}
 	return newWatcher(rsp)
+}
+
+// Write is unsupported
+func (g *grpcSource) Write(cs *source.ChangeSet) error {
+	return nil
 }
 
 func (g *grpcSource) String() string {

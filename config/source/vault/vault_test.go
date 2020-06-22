@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/micro/go-micro/config"
+	"github.com/micro/go-micro/v2/config"
 )
 
 func TestVaultMakeMap(t *testing.T) {
@@ -116,7 +116,10 @@ func TestVaultNewSource(t *testing.T) {
 		t.Skip()
 	}
 
-	conf := config.NewConfig()
+	conf, err := config.NewConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	_ = conf.Load(NewSource(
 		WithAddress("http://127.0.0.1"),

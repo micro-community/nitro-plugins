@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/micro/go-micro/config"
+	"github.com/micro/go-micro/v2/config"
 )
 
 func TestGetClient(t *testing.T) {
@@ -187,11 +187,14 @@ func TestNewSource(t *testing.T) {
 		return
 	}
 
-	conf := config.NewConfig()
+	conf, err := config.NewConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	conf.Load(NewSource())
 
-	if mongodbHost := conf.Get("mongodb", "host").String("localhost"); mongodbHost != "127.0.0.1" {
+	if mongodbHost := conf.Get("mongodb", "host").String("localhost"); mongodbHost != "127.0.0.1" && mongodbHost != "localhost" {
 		t.Errorf("expected %v and got %v", "127.0.0.1", mongodbHost)
 	}
 

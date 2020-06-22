@@ -9,11 +9,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/micro/cli"
-	"github.com/micro/go-micro/config"
-	"github.com/micro/go-micro/config/source"
-	"github.com/micro/go-micro/config/source/file"
-	"github.com/micro/micro/plugin"
+	"github.com/micro/cli/v2"
+	"github.com/micro/go-micro/v2/config"
+	"github.com/micro/go-micro/v2/config/source"
+	"github.com/micro/go-micro/v2/config/source/file"
+	"github.com/micro/micro/v2/plugin"
 	"github.com/sirupsen/logrus"
 )
 
@@ -97,15 +97,15 @@ func (r *router) run(c config.Config) {
 
 func (r *router) Flags() []cli.Flag {
 	return []cli.Flag{
-		cli.StringFlag{
-			Name:   "config_source",
-			EnvVar: "CONFIG_SOURCE",
-			Usage:  "Source to read the config from e.g file:path/to/file, platform",
+		&cli.StringFlag{
+			Name:    "config_source",
+			EnvVars: []string{"CONFIG_SOURCE"},
+			Usage:   "Source to read the config from e.g file:path/to/file, platform",
 		},
 	}
 }
 
-func (r *router) Commands() []cli.Command {
+func (r *router) Commands() []*cli.Command {
 	return nil
 }
 
@@ -157,7 +157,10 @@ func (r *router) Init(ctx *cli.Context) error {
 		}
 
 		// set config
-		conf = config.NewConfig()
+		conf, err := config.NewConfig()
+		if err != nil {
+			return err
+		}
 		// load source
 		if err := conf.Load(source); err != nil {
 			return err

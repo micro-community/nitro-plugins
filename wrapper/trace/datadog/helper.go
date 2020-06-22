@@ -3,9 +3,8 @@ package datadog
 import (
 	"context"
 
-	log "github.com/micro/go-micro/util/log"
-
-	"github.com/micro/go-micro/metadata"
+	log "github.com/micro/go-micro/v2/logger"
+	"github.com/micro/go-micro/v2/metadata"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
@@ -17,9 +16,6 @@ func StartSpanFromContext(ctx context.Context, operationName string, opts ...tra
 		md = make(map[string]string)
 	}
 
-	// copy the metadata to prevent race
-	md = metadata.Copy(md)
-
 	if spanCtx, err := tracer.Extract(tracer.TextMapCarrier(md)); err == nil {
 		opts = append(opts, tracer.ChildOf(spanCtx))
 	}
@@ -27,7 +23,7 @@ func StartSpanFromContext(ctx context.Context, operationName string, opts ...tra
 	span, ctx := tracer.StartSpanFromContext(ctx, operationName, opts...)
 
 	if err := tracer.Inject(span.Context(), tracer.TextMapCarrier(md)); err != nil {
-		log.Logf("error while injecting trace to context: %s\n", err)
+		log.Errorf("error while injecting trace to context: %s\n", err)
 	}
 
 	return span, metadata.NewContext(ctx, md)

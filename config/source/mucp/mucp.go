@@ -3,10 +3,10 @@ package mucp
 import (
 	"context"
 
-	"github.com/micro/go-micro/config/cmd"
-	"github.com/micro/go-micro/config/source"
-	"github.com/micro/go-micro/util/log"
-	proto "github.com/micro/go-plugins/config/source/mucp/proto"
+	"github.com/micro/go-micro/v2/config/cmd"
+	"github.com/micro/go-micro/v2/config/source"
+	log "github.com/micro/go-micro/v2/logger"
+	proto "github.com/micro/go-plugins/config/source/mucp/v2/proto"
 )
 
 var (
@@ -37,6 +37,11 @@ func (m *mucpSource) Watch() (w source.Watcher, err error) {
 		return
 	}
 	return newWatcher(stream)
+}
+
+// Write is unsupported
+func (m *mucpSource) Write(cs *source.ChangeSet) error {
+	return nil
 }
 
 func (m *mucpSource) String() string {

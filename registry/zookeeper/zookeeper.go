@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/micro/go-micro/config/cmd"
-	"github.com/micro/go-micro/registry"
-	"github.com/micro/go-micro/util/log"
+	"github.com/micro/go-micro/v2/config/cmd"
+	log "github.com/micro/go-micro/v2/logger"
+	"github.com/micro/go-micro/v2/registry"
 	"github.com/samuel/go-zookeeper/zk"
 
 	hash "github.com/mitchellh/hashstructure"
@@ -62,12 +62,14 @@ func configure(z *zookeeperRegistry, opts ...registry.Option) error {
 	// connect to zookeeper
 	c, _, err := zk.Connect(cAddrs, time.Second*z.options.Timeout)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err.Error())
+		return err
 	}
 
 	// create our prefix path
 	if err := createPath(prefix, []byte{}, c); err != nil {
-		log.Fatal(err)
+		log.Error(err.Error())
+		return err
 	}
 
 	z.client = c
@@ -82,7 +84,7 @@ func (z *zookeeperRegistry) Options() registry.Options {
 	return z.options
 }
 
-func (z *zookeeperRegistry) Deregister(s *registry.Service) error {
+func (z *zookeeperRegistry) Deregister(s *registry.Service, opts ...registry.DeregisterOption) error {
 	if len(s.Nodes) == 0 {
 		return errors.New("Require at least one node")
 	}
@@ -168,7 +170,7 @@ func (z *zookeeperRegistry) Register(s *registry.Service, opts ...registry.Regis
 	return nil
 }
 
-func (z *zookeeperRegistry) GetService(name string) ([]*registry.Service, error) {
+func (z *zookeeperRegistry) GetService(name string, opts ...registry.GetOption) ([]*registry.Service, error) {
 	l, _, err := z.client.Children(servicePath(name))
 	if err != nil {
 		return nil, err
@@ -221,7 +223,7 @@ func (z *zookeeperRegistry) GetService(name string) ([]*registry.Service, error)
 	return services, nil
 }
 
-func (z *zookeeperRegistry) ListServices() ([]*registry.Service, error) {
+func (z *zookeeperRegistry) ListServices(opts ...registry.ListOption) ([]*registry.Service, error) {
 	srv, _, err := z.client.Children(prefix)
 	if err != nil {
 		return nil, err
@@ -298,12 +300,14 @@ func NewRegistry(opts ...registry.Option) registry.Registry {
 	// connect to zookeeper
 	c, _, err := zk.Connect(cAddrs, time.Second*options.Timeout)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err.Error())
+		return nil
 	}
 
 	// create our prefix path
 	if err := createPath(prefix, []byte{}, c); err != nil {
-		log.Fatal(err)
+		log.Error(err.Error())
+		return nil
 	}
 
 	return &zookeeperRegistry{

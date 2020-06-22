@@ -10,7 +10,8 @@ import (
 	"time"
 
 	mc "github.com/bradfitz/gomemcache/memcache"
-	"github.com/micro/go-micro/store"
+	log "github.com/micro/go-micro/v2/logger"
+	"github.com/micro/go-micro/v2/store"
 )
 
 type mkv struct {
@@ -19,57 +20,59 @@ type mkv struct {
 	Client  *mc.Client
 }
 
-func (m *mkv) Read(keys ...string) ([]*store.Record, error) {
-	records := make([]*store.Record, 0, len(keys))
-
-	for _, key := range keys {
-		keyval, err := m.Client.Get(key)
-		if err != nil && err == mc.ErrCacheMiss {
-			return nil, store.ErrNotFound
-		} else if err != nil {
-			return nil, err
-		}
-
-		if keyval == nil {
-			return nil, store.ErrNotFound
-		}
-
-		records = append(records, &store.Record{
-			Key:    keyval.Key,
-			Value:  keyval.Value,
-			Expiry: time.Second * time.Duration(keyval.Expiration),
-		})
+func (m *mkv) Init(opts ...store.Option) error {
+	for _, o := range opts {
+		o(&m.options)
 	}
+	return m.configure()
+}
+
+func (m *mkv) Options() store.Options {
+	return m.options
+}
+
+func (m *mkv) Close() error {
+	// memcaced does not supports close?
+	return nil
+}
+
+func (m *mkv) Read(key string, opts ...store.ReadOption) ([]*store.Record, error) {
+	// TODO: implement read options
+	records := make([]*store.Record, 0, 1)
+
+	keyval, err := m.Client.Get(key)
+	if err != nil && err == mc.ErrCacheMiss {
+		return nil, store.ErrNotFound
+	} else if err != nil {
+		return nil, err
+	}
+
+	if keyval == nil {
+		return nil, store.ErrNotFound
+	}
+
+	records = append(records, &store.Record{
+		Key:    keyval.Key,
+		Value:  keyval.Value,
+		Expiry: time.Second * time.Duration(keyval.Expiration),
+	})
+
 	return records, nil
 }
 
-func (m *mkv) Delete(keys ...string) error {
-	var err error
-	for _, key := range keys {
-		if err = m.Client.Delete(key); err != nil {
-			return err
-		}
-	}
-	return nil
+func (m *mkv) Delete(key string, opts ...store.DeleteOption) error {
+	return m.Client.Delete(key)
 }
 
-func (m *mkv) Write(records ...*store.Record) error {
-	var err error
-
-	for _, record := range records {
-		err = m.Client.Set(&mc.Item{
-			Key:        record.Key,
-			Value:      record.Value,
-			Expiration: int32(record.Expiry.Seconds()),
-		})
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+func (m *mkv) Write(record *store.Record, opts ...store.WriteOption) error {
+	return m.Client.Set(&mc.Item{
+		Key:        record.Key,
+		Value:      record.Value,
+		Expiration: int32(record.Expiry.Seconds()),
+	})
 }
 
-func (m *mkv) List() ([]*store.Record, error) {
+func (m *mkv) List(opts ...store.ListOption) ([]string, error) {
 	// stats
 	// cachedump
 	// get keys
@@ -147,31 +150,7 @@ func (m *mkv) List() ([]*store.Record, error) {
 		return nil, err
 	}
 
-	var vals []*store.Record
-
-	// concurrent op
-	ch := make(chan []*store.Record, len(keys))
-
-	for _, k := range keys {
-		go func(key string) {
-			i, _ := m.Read(key)
-			ch <- i
-		}(k)
-	}
-
-	for i := 0; i < len(keys); i++ {
-		records := <-ch
-
-		if records == nil {
-			continue
-		}
-
-		vals = append(vals, records...)
-	}
-
-	close(ch)
-
-	return vals, nil
+	return keys, nil
 }
 
 func (m *mkv) String() string {
@@ -184,7 +163,18 @@ func NewStore(opts ...store.Option) store.Store {
 		o(&options)
 	}
 
-	nodes := options.Nodes
+	s := new(mkv)
+	s.options = options
+
+	if err := s.configure(); err != nil {
+		log.Fatal(err)
+	}
+
+	return s
+}
+
+func (m *mkv) configure() error {
+	nodes := m.options.Nodes
 
 	if len(nodes) == 0 {
 		nodes = []string{"127.0.0.1:11211"}
@@ -193,9 +183,8 @@ func NewStore(opts ...store.Option) store.Store {
 	ss := new(mc.ServerList)
 	ss.SetServers(nodes...)
 
-	return &mkv{
-		options: options,
-		Server:  ss,
-		Client:  mc.New(nodes...),
-	}
+	m.Server = ss
+	m.Client = mc.New(nodes...)
+
+	return nil
 }

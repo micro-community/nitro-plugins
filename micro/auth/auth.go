@@ -5,14 +5,14 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/micro/cli"
-	"github.com/micro/go-micro/util/log"
-	"github.com/micro/micro/plugin"
+	"github.com/micro/cli/v2"
+	log "github.com/micro/go-micro/v2/logger"
+	"github.com/micro/micro/v2/plugin"
 
 	// enterprise auth
-	"github.com/micro/go-plugins/micro/auth/basic"
-	"github.com/micro/go-plugins/micro/auth/digest"
-	"github.com/micro/go-plugins/micro/auth/ldap"
+	"github.com/micro/go-plugins/micro/auth/v2/basic"
+	"github.com/micro/go-plugins/micro/auth/v2/digest"
+	"github.com/micro/go-plugins/micro/auth/v2/ldap"
 )
 
 type Auth struct {
@@ -44,11 +44,11 @@ func NewPlugin() plugin.Plugin {
 	return plugin.NewPlugin(
 		plugin.WithName("auth"),
 		plugin.WithFlag(
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "auth",
 				Usage: "Specify the type of auth e.g basic:///path/to/file, digest:///path/to/file, ldap[s]://url",
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "realm",
 				Usage: "Specify the realm for auth",
 			},
@@ -70,12 +70,12 @@ func NewPlugin() plugin.Plugin {
 			switch typ {
 			case "basic":
 				auth.Provider = basic.New(file, authRealm)
-				log.Logf("Loaded basic auth file: %s\n", file)
+				log.Infof("Loaded basic auth file: %s", file)
 			case "digest":
-				log.Logf("Loaded digest auth file: %s\n", file)
+				log.Infof("Loaded digest auth file: %s", file)
 				auth.Provider = digest.New(file, authRealm)
 			case "ldap", "ldaps":
-				log.Logf("Loaded ldap auth url: %s\n", file)
+				log.Infof("Loaded ldap auth url: %s", file)
 				auth.Provider = ldap.New(file, authRealm)
 			}
 

@@ -3,7 +3,7 @@ package rabbitmq
 import (
 	"context"
 
-	"github.com/micro/go-micro/broker"
+	"github.com/micro/go-micro/v2/broker"
 )
 
 type durableQueueKey struct{}
@@ -14,6 +14,7 @@ type prefetchGlobalKey struct{}
 type exchangeKey struct{}
 type requeueOnErrorKey struct{}
 type deliveryMode struct{}
+type priorityKey struct{}
 type externalAuth struct{}
 type durableExchange struct{}
 
@@ -42,8 +43,8 @@ func RequeueOnError() broker.SubscribeOption {
 	return setSubscribeOption(requeueOnErrorKey{}, true)
 }
 
-// Exchange is an option to set the Exchange
-func Exchange(e string) broker.Option {
+// ExchangeName is an option to set the ExchangeName
+func ExchangeName(e string) broker.Option {
 	return setBrokerOption(exchangeKey{}, e)
 }
 
@@ -60,6 +61,11 @@ func PrefetchGlobal() broker.Option {
 // DeliveryMode sets a delivery mode for publishing
 func DeliveryMode(value uint8) broker.PublishOption {
 	return setPublishOption(deliveryMode{}, value)
+}
+
+// Priority sets a priority level for publishing
+func Priority(value uint8) broker.PublishOption {
+	return setPublishOption(priorityKey{}, value)
 }
 
 func ExternalAuth() broker.Option {

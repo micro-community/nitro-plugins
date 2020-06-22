@@ -1,8 +1,11 @@
 package redis
 
 import (
-	"github.com/micro/go-micro/store"
-	redis "gopkg.in/redis.v3"
+	"fmt"
+
+	log "github.com/micro/go-micro/v2/logger"
+	"github.com/micro/go-micro/v2/store"
+	redis "gopkg.in/redis.v5"
 )
 
 type rkv struct {
@@ -10,74 +13,97 @@ type rkv struct {
 	Client  *redis.Client
 }
 
-func (r *rkv) Read(keys ...string) ([]*store.Record, error) {
-	records := make([]*store.Record, 0, len(keys))
-
-	for _, key := range keys {
-		val, err := r.Client.Get(key).Bytes()
-
-		if err != nil && err == redis.Nil {
-			return nil, store.ErrNotFound
-		} else if err != nil {
-			return nil, err
-		}
-
-		if val == nil {
-			return nil, store.ErrNotFound
-		}
-
-		d, err := r.Client.TTL(key).Result()
-		if err != nil {
-			return nil, err
-		}
-
-		records = append(records, &store.Record{
-			Key:    key,
-			Value:  val,
-			Expiry: d,
-		})
+func (r *rkv) Init(opts ...store.Option) error {
+	for _, o := range opts {
+		o(&r.options)
 	}
+
+	return r.configure()
+}
+
+func (r *rkv) Close() error {
+	return r.Client.Close()
+}
+
+func (r *rkv) Read(key string, opts ...store.ReadOption) ([]*store.Record, error) {
+	options := store.ReadOptions{}
+	options.Table = r.options.Table
+
+	for _, o := range opts {
+		o(&options)
+	}
+
+	records := make([]*store.Record, 0, 1)
+
+	rkey := fmt.Sprintf("%s%s", options.Table, key)
+	val, err := r.Client.Get(rkey).Bytes()
+
+	if err != nil && err == redis.Nil {
+		return nil, store.ErrNotFound
+	} else if err != nil {
+		return nil, err
+	}
+
+	if val == nil {
+		return nil, store.ErrNotFound
+	}
+
+	d, err := r.Client.TTL(rkey).Result()
+	if err != nil {
+		return nil, err
+	}
+
+	records = append(records, &store.Record{
+		Key:    key,
+		Value:  val,
+		Expiry: d,
+	})
 
 	return records, nil
 }
 
-func (r *rkv) Delete(keys ...string) error {
-	var err error
-	for _, key := range keys {
-		if err = r.Client.Del(key).Err(); err != nil {
-			return err
-		}
+func (r *rkv) Delete(key string, opts ...store.DeleteOption) error {
+	options := store.DeleteOptions{}
+	options.Table = r.options.Table
+
+	for _, o := range opts {
+		o(&options)
 	}
-	return nil
+
+	rkey := fmt.Sprintf("%s%s", options.Table, key)
+	return r.Client.Del(rkey).Err()
 }
 
-func (r *rkv) Write(records ...*store.Record) error {
-	var err error
+func (r *rkv) Write(record *store.Record, opts ...store.WriteOption) error {
+	options := store.WriteOptions{}
+	options.Table = r.options.Table
 
-	for _, record := range records {
-		err = r.Client.Set(record.Key, record.Value, record.Expiry).Err()
-		if err != nil {
-			return err
-		}
+	for _, o := range opts {
+		o(&options)
 	}
-	return nil
+
+	rkey := fmt.Sprintf("%s%s", options.Table, record.Key)
+	return r.Client.Set(rkey, record.Value, record.Expiry).Err()
 }
 
-func (r *rkv) List() ([]*store.Record, error) {
+func (r *rkv) List(opts ...store.ListOption) ([]string, error) {
+	options := store.ListOptions{}
+	options.Table = r.options.Table
+
+	for _, o := range opts {
+		o(&options)
+	}
+
 	keys, err := r.Client.Keys("*").Result()
 	if err != nil {
 		return nil, err
 	}
 
-	vals := make([]*store.Record, 0, len(keys))
-	for _, k := range keys {
-		i, err := r.Read(k)
-		if err != nil {
-			return nil, err
-		}
-		vals = append(vals, i...)
-	}
-	return vals, nil
+	return keys, nil
+}
+
+func (r *rkv) Options() store.Options {
+	return r.options
 }
 
 func (r *rkv) String() string {
@@ -90,18 +116,28 @@ func NewStore(opts ...store.Option) store.Store {
 		o(&options)
 	}
 
-	nodes := options.Nodes
+	s := new(rkv)
+	s.options = options
+
+	if err := s.configure(); err != nil {
+		log.Fatal(err)
+	}
+
+	return s
+}
+
+func (r *rkv) configure() error {
+	nodes := r.options.Nodes
 
 	if len(nodes) == 0 {
 		nodes = []string{"127.0.0.1:6379"}
 	}
 
-	return &rkv{
-		options: options,
-		Client: redis.NewClient(&redis.Options{
-			Addr:     nodes[0],
-			Password: "", // no password set
-			DB:       0,  // use default DB
-		}),
-	}
+	r.Client = redis.NewClient(&redis.Options{
+		Addr:     nodes[0],
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
+
+	return nil
 }

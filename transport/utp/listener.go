@@ -6,8 +6,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/micro/go-micro/transport"
-	"github.com/micro/go-micro/util/log"
+	log "github.com/micro/go-micro/v2/logger"
+	"github.com/micro/go-micro/v2/transport"
 )
 
 func (u *utpListener) Addr() string {
@@ -33,7 +33,7 @@ func (u *utpListener) Accept(fn func(transport.Socket)) error {
 				if max := 1 * time.Second; tempDelay > max {
 					tempDelay = max
 				}
-				log.Logf("utp: Accept error: %v; retrying in %v\n", err, tempDelay)
+				log.Errorf("utp: Accept error: %v; retrying in %v\n", err, tempDelay)
 				time.Sleep(tempDelay)
 				continue
 			}

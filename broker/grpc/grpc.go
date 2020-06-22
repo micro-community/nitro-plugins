@@ -14,16 +14,16 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/micro/go-micro/broker"
-	"github.com/micro/go-micro/config/cmd"
-	merr "github.com/micro/go-micro/errors"
-	"github.com/micro/go-micro/registry"
-	"github.com/micro/go-micro/registry/cache"
-	maddr "github.com/micro/go-micro/util/addr"
-	"github.com/micro/go-micro/util/log"
-	mnet "github.com/micro/go-micro/util/net"
-	mls "github.com/micro/go-micro/util/tls"
-	proto "github.com/micro/go-plugins/broker/grpc/proto"
+	"github.com/micro/go-micro/v2/broker"
+	"github.com/micro/go-micro/v2/config/cmd"
+	merr "github.com/micro/go-micro/v2/errors"
+	log "github.com/micro/go-micro/v2/logger"
+	"github.com/micro/go-micro/v2/registry"
+	"github.com/micro/go-micro/v2/registry/cache"
+	maddr "github.com/micro/go-micro/v2/util/addr"
+	mnet "github.com/micro/go-micro/v2/util/net"
+	mls "github.com/micro/go-micro/v2/util/tls"
+	proto "github.com/micro/go-plugins/broker/grpc/v2/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -56,12 +56,13 @@ type grpcSubscriber struct {
 }
 
 type grpcEvent struct {
-	m *broker.Message
-	t string
+	m   *broker.Message
+	t   string
+	err error
 }
 
 var (
-	registryKey = "github.com/micro/go-micro/registry"
+	registryKey = "github.com/micro/go-micro/v2/registry"
 
 	broadcastVersion = "ff.grpc.broadcast"
 	registerTTL      = time.Minute
@@ -124,6 +125,10 @@ func (h *grpcEvent) Ack() error {
 	return nil
 }
 
+func (h *grpcEvent) Error() error {
+	return h.err
+}
+
 func (h *grpcEvent) Message() *broker.Message {
 	return h.m
 }
@@ -162,7 +167,7 @@ func (h *grpcHandler) Publish(ctx context.Context, msg *proto.Message) (*proto.E
 		if msg.Id == subscriber.id {
 			// sub is sync; crufty rate limiting
 			// so we don't hose the cpu
-			subscriber.fn(p)
+			p.err = subscriber.fn(p)
 		}
 	}
 	h.g.RUnlock()
@@ -293,7 +298,7 @@ func (h *grpcBroker) Connect() error {
 		return err
 	}
 
-	log.Logf("Broker Listening on %s", l.Addr().String())
+	log.Infof("[grpc] Broker Listening on %s", l.Addr().String())
 	addr := h.address
 	h.address = l.Addr().String()
 
@@ -320,7 +325,6 @@ func (h *grpcBroker) Connect() error {
 }
 
 func (h *grpcBroker) Disconnect() error {
-
 	h.RLock()
 	if !h.running {
 		h.RUnlock()
@@ -432,12 +436,23 @@ func (h *grpcBroker) Publish(topic string, msg *broker.Message, opts ...broker.P
 		// dial grpc connection
 		c, err := grpc.Dial(node.Address, opts...)
 		if err != nil {
-			log.Logf(err.Error())
+			log.Errorf(err.Error())
 			return
 		}
 
+		defer func() {
+			if err := c.Close(); err != nil {
+				log.Errorf(err.Error())
+				return
+			}
+		}()
+
 		// publish message
-		proto.NewBrokerClient(c).Publish(context.TODO(), m)
+		_, err = proto.NewBrokerClient(c).Publish(context.TODO(), m)
+		if err != nil {
+			log.Errorf(err.Error())
+			return
+		}
 	}
 
 	for _, service := range s {

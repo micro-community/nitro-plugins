@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/micro/go-micro/config/source"
+	"github.com/micro/go-micro/v2/config/source"
 )
 
 type urlSource struct {
@@ -48,6 +48,11 @@ func (u *urlSource) Read() (*source.ChangeSet, error) {
 
 func (u *urlSource) Watch() (source.Watcher, error) {
 	return newWatcher(u)
+}
+
+// Write is unsupported
+func (u *urlSource) Write(cs *source.ChangeSet) error {
+	return nil
 }
 
 func (u *urlSource) String() string {
