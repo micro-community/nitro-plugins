@@ -13,8 +13,7 @@ import (
 
 	"github.com/micro/go-micro/v2/broker"
 	"github.com/micro/go-micro/v2/client"
-	"github.com/micro/go-micro/v2/client/selector"
-	"github.com/micro/go-micro/v2/config/cmd"
+	"github.com/micro/go-micro/v2/cmd"
 	"github.com/micro/go-micro/v2/registry"
 	"github.com/micro/go-micro/v2/server"
 	"github.com/micro/go-micro/v2/transport"
@@ -60,13 +59,6 @@ func Init(p *Plugin) error {
 			return fmt.Errorf("Invalid plugin %s", p.Name)
 		}
 		cmd.DefaultRegistries[p.Name] = pg
-
-	case "selector":
-		pg, ok := p.NewFunc.(func(...selector.Option) selector.Selector)
-		if !ok {
-			return fmt.Errorf("Invalid plugin %s", p.Name)
-		}
-		cmd.DefaultSelectors[p.Name] = pg
 	case "server":
 		pg, ok := p.NewFunc.(func(...server.Option) server.Server)
 		if !ok {

@@ -3,9 +3,9 @@ package redis
 import (
 	"fmt"
 
+	"github.com/go-redis/redis/v7"
 	log "github.com/micro/go-micro/v2/logger"
 	"github.com/micro/go-micro/v2/store"
-	redis "gopkg.in/redis.v5"
 )
 
 type rkv struct {
@@ -33,31 +33,51 @@ func (r *rkv) Read(key string, opts ...store.ReadOption) ([]*store.Record, error
 		o(&options)
 	}
 
-	records := make([]*store.Record, 0, 1)
+	var keys []string
 
 	rkey := fmt.Sprintf("%s%s", options.Table, key)
-	val, err := r.Client.Get(rkey).Bytes()
+	// Handle Prefix
+	// TODO suffix
+	if options.Prefix {
+		prefixKey := fmt.Sprintf("%s*", rkey)
+		fkeys, err := r.Client.Keys(prefixKey).Result()
+		if err != nil {
+			return nil, err
+		}
+		// TODO Limit Offset
 
-	if err != nil && err == redis.Nil {
-		return nil, store.ErrNotFound
-	} else if err != nil {
-		return nil, err
+		keys = append(keys, fkeys...)
+
+	} else {
+		keys = []string{rkey}
 	}
 
-	if val == nil {
-		return nil, store.ErrNotFound
-	}
+	records := make([]*store.Record, 0, len(keys))
 
-	d, err := r.Client.TTL(rkey).Result()
-	if err != nil {
-		return nil, err
-	}
+	for _, rkey = range keys {
+		val, err := r.Client.Get(rkey).Bytes()
 
-	records = append(records, &store.Record{
-		Key:    key,
-		Value:  val,
-		Expiry: d,
-	})
+		if err != nil && err == redis.Nil {
+			return nil, store.ErrNotFound
+		} else if err != nil {
+			return nil, err
+		}
+
+		if val == nil {
+			return nil, store.ErrNotFound
+		}
+
+		d, err := r.Client.TTL(rkey).Result()
+		if err != nil {
+			return nil, err
+		}
+
+		records = append(records, &store.Record{
+			Key:    key,
+			Value:  val,
+			Expiry: d,
+		})
+	}
 
 	return records, nil
 }
@@ -127,17 +147,24 @@ func NewStore(opts ...store.Option) store.Store {
 }
 
 func (r *rkv) configure() error {
+	var redisOptions *redis.Options
 	nodes := r.options.Nodes
 
 	if len(nodes) == 0 {
-		nodes = []string{"127.0.0.1:6379"}
+		nodes = []string{"redis://127.0.0.1:6379"}
 	}
 
-	r.Client = redis.NewClient(&redis.Options{
-		Addr:     nodes[0],
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
+	redisOptions, err := redis.ParseURL(nodes[0])
+	if err != nil {
+		//Backwards compatibility
+		redisOptions = &redis.Options{
+			Addr:     nodes[0],
+			Password: "", // no password set
+			DB:       0,  // use default DB
+		}
+	}
+
+	r.Client = redis.NewClient(redisOptions)
 
 	return nil
 }
