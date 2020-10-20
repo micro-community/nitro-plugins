@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/asim/go-micro/v3/store"
+	"github.com/asim/go-micro/v3/sync"
 	"github.com/caddyserver/certmagic"
-	"github.com/micro/go-micro/v3/store"
-	"github.com/micro/go-micro/v3/sync"
 )
 
 // File represents a "File" that will be stored in store.Store - the contents and last modified time
