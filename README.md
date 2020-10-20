@@ -1,10 +1,10 @@
 # Plugins [![License](https://img.shields.io/:license-apache-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![GoDoc](https://godoc.org/github.com/micro/go-plugins?status.svg)](https://godoc.org/github.com/micro/go-plugins)
 
-Go plugins is a place for community maintained plugins.
+Go plugins is a place for third party implementations of Go Micro interfaces.
 
 ## Overview
 
-Micro is built as a pluggable framework using Go interfaces. Plugins enable you to swap out the underlying infrastructure without having 
+Go Micro is built as a pluggable framework using Go interfaces. Plugins enable you to swap out the underlying infrastructure without having 
 to rewrite all your code. This enables running the same software in multiple environments without a ton of work. Read further for more info.
 
 ## Getting Started
