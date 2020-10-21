@@ -81,7 +81,11 @@ func TestZKRegistry(t *testing.T) {
 func rawConnect(host string, port string) bool {
 	timeout := time.Second
 	conn, err := net.DialTimeout("tcp", net.JoinHostPort(host, port), timeout)
-	defer conn.Close()
+	defer func() {
+		if conn != nil {
+			conn.Close()
+		}
+	}()
 
 	if err != nil {
 		return false
