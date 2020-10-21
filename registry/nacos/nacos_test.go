@@ -63,7 +63,11 @@ func TestNacosRegistry(t *testing.T) {
 			Ephemeral: true,
 		}
 		err := r.Register(service, func(options *registry.RegisterOptions) {
-			options.Context = context.WithValue(options.Context, "register_instance_param", param)
+			ctx := options.Context
+			if ctx == nil {
+				ctx = context.Background()
+			}
+			options.Context = context.WithValue(ctx, "register_instance_param", param)
 		})
 		assert.Nil(t, err)
 	})
@@ -103,7 +107,11 @@ func TestNacosDeRegistry(t *testing.T) {
 			ServiceName: "demo",
 		}
 		err := r.Deregister(service, func(options *registry.DeregisterOptions) {
-			options.Context = context.WithValue(options.Context, "deregister_instance_param", param)
+			ctx := options.Context
+			if ctx == nil {
+				ctx = context.Background()
+			}
+			options.Context = context.WithValue(ctx, "deregister_instance_param", param)
 		})
 		assert.Nil(t, err)
 	})
@@ -129,7 +137,11 @@ func TestNacosGetService(t *testing.T) {
 			GroupName:   "DEFAULT_GROUP",
 		}
 		services, err := r.GetService("", func(options *registry.GetOptions) {
-			options.Context = context.WithValue(options.Context, "select_instances_param", param)
+			ctx := options.Context
+			if ctx == nil {
+				ctx = context.Background()
+			}
+			options.Context = context.WithValue(ctx, "select_instances_param", param)
 		})
 		assert.True(t, len(services) == 1 && services[0].Name == "demo")
 		assert.Nil(t, err)
@@ -156,7 +168,11 @@ func TestNacosListServices(t *testing.T) {
 			PageSize: 10,
 		}
 		services, err := r.ListServices(func(options *registry.ListOptions) {
-			options.Context = context.WithValue(options.Context, "get_all_service_info_param", param)
+			ctx := options.Context
+			if ctx == nil {
+				ctx = context.Background()
+			}
+			options.Context = context.WithValue(ctx, "get_all_service_info_param", param)
 		})
 		assert.True(t, len(services) == 2 && err == nil)
 	})

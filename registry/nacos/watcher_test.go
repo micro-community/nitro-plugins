@@ -34,6 +34,9 @@ func TestNacosRegistryWatch(t *testing.T) {
 			ServiceName: "demo",
 		}
 		watcher, err := r.Watch(func(options *registry.WatchOptions) {
+			if options.Context == nil {
+				options.Context = context.Background()
+			}
 			options.Context = context.WithValue(options.Context, "subscribe_param", param)
 		})
 		assert.NotNil(t, watcher)
