@@ -17,6 +17,8 @@ import (
 var (
 	DefaultExchange = Exchange{
 		Name: "micro",
+		Kind: "topic",
+		Args: nil,
 	}
 	DefaultRabbitURL      = "amqp://guest:guest@127.0.0.1:5672"
 	DefaultPrefetchCount  = 0
@@ -61,6 +63,10 @@ type Exchange struct {
 	Name string
 	// Whether its persistent
 	Durable bool
+
+	Kind string
+
+	Args amqp.Table
 }
 
 func newRabbitMQConn(ex Exchange, urls []string, prefetchCount int, prefetchGlobal bool) *rabbitMQConn {
@@ -209,9 +215,9 @@ func (r *rabbitMQConn) tryConnect(secure bool, config *amqp.Config) error {
 	}
 
 	if r.exchange.Durable {
-		r.Channel.DeclareDurableExchange(r.exchange.Name)
+		r.Channel.DeclareDurableExchange(r.exchange.Name,r.exchange.Kind,r.exchange.Args)
 	} else {
-		r.Channel.DeclareExchange(r.exchange.Name)
+		r.Channel.DeclareExchange(r.exchange.Name,r.exchange.Kind,r.exchange.Args)
 	}
 	r.ExchangeChannel, err = newRabbitChannel(r.Connection, r.prefetchCount, r.prefetchGlobal)
 
