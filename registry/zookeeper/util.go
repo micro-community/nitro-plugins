@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-zookeeper/zk"
 	log "github.com/asim/go-micro/v3/logger"
 	"github.com/asim/go-micro/v3/registry"
+	"github.com/go-zookeeper/zk"
 )
 
 func encode(s *registry.Service) ([]byte, error) {

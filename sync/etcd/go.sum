@@ -2,6 +2,8 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/asim/go-micro v1.18.0 h1:k/qyLA5R175Vr1Owf90Ms1+J/zhBf/aa8aiHGhk0x5s=
 github.com/asim/go-micro/v3 v3.2.0 h1:rEY9YaNvnr/x3ezZ+alZAZ9ojvykmZH6g38BiW3UkWg=
 github.com/asim/go-micro/v3 v3.2.0/go.mod h1:TQY5AF62wNtz/c5ywBTkv7VW0eBHJBcEAvqZ84XUPKE=
+github.com/asim/go-micro/v3 v3.2.1-0.20201022122155-691ff2025fd5 h1:0YJqNp0nDrAkE15ZQ/d48eTnjTCjzVRn0AdQhQD/1cc=
+github.com/asim/go-micro/v3 v3.2.1-0.20201022122155-691ff2025fd5/go.mod h1:TQY5AF62wNtz/c5ywBTkv7VW0eBHJBcEAvqZ84XUPKE=
 github.com/bitly/go-simplejson v0.5.0/go.mod h1:cXHtHw4XUPsvGaxgjIAn8PhEWG9NfngEKAMDJEczWVA=
 github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869/go.mod h1:Ekp36dRnpXw/yCqJaO+ZrUyxD+3VXMFFr56k5XYrpB4=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
