@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+set -x
+
 mod="github.com/micro/go-plugins"
 PKGS=""
 for d in $(find * -name 'go.mod'); do
