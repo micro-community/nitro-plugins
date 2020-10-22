@@ -7,7 +7,7 @@ import (
 
 	"github.com/asim/go-micro/v3/broker/http"
 	"github.com/asim/go-micro/v3/codec"
-	"github.com/asim/go-micro/v3/registry/mdns"
+	"github.com/asim/go-micro/v3/registry/memory"
 	"github.com/asim/go-micro/v3/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/encoding"
@@ -68,7 +68,7 @@ func newOptions(opt ...server.Option) server.Options {
 		Codecs:           make(map[string]codec.NewCodec),
 		Metadata:         map[string]string{},
 		Broker:           http.NewBroker(),
-		Registry:         mdns.NewRegistry(),
+		Registry:         memory.NewRegistry(),
 		Address:          server.DefaultAddress,
 		Name:             server.DefaultName,
 		Id:               server.DefaultId,

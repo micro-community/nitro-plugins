@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"github.com/asim/go-micro/v3/client"
-	"github.com/asim/go-micro/v3/model"
 	"github.com/asim/go-micro/v3/server"
 	"github.com/asim/go-micro/v3/service"
 	gclient "github.com/asim/go-plugins/client/grpc/v3"
@@ -45,10 +44,6 @@ func (s *grpcService) Client() client.Client {
 
 func (s *grpcService) Server() server.Server {
 	return s.opts.Server
-}
-
-func (s *grpcService) Model() model.Model {
-	return s.opts.Model
 }
 
 func (s *grpcService) String() string {
