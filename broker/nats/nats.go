@@ -7,10 +7,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/micro/go-micro/v3/broker"
-	"github.com/micro/go-micro/v3/codec/json"
-	"github.com/micro/go-micro/v3/logger"
-	"github.com/micro/go-micro/v3/registry/mdns"
+	"github.com/asim/go-micro/v3/broker"
+	"github.com/asim/go-micro/v3/codec/json"
+	"github.com/asim/go-micro/v3/logger"
+	"github.com/asim/go-micro/v3/registry/memory"
 	nats "github.com/nats-io/nats.go"
 )
 
@@ -282,7 +282,7 @@ func NewBroker(opts ...broker.Option) broker.Broker {
 		// Default codec
 		Codec:    json.Marshaler{},
 		Context:  context.Background(),
-		Registry: mdns.NewRegistry(),
+		Registry: memory.NewRegistry(),
 	}
 
 	n := &natsBroker{

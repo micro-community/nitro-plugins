@@ -6,7 +6,7 @@ import (
 	"crypto/tls"
 	"net"
 
-	"github.com/asim/go-micro/v3/network/transport"
+	"github.com/asim/go-micro/v3/transport"
 	maddr "github.com/asim/go-micro/v3/util/addr"
 	mnet "github.com/asim/go-micro/v3/util/net"
 	mls "github.com/asim/go-micro/v3/util/tls"
@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
-	pb "github.com/asim/go-micro/v3/network/transport/grpc/proto"
+	pb "github.com/asim/go-plugins/transport/grpc/v3/proto"
 )
 
 type grpcTransport struct {

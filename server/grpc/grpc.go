@@ -23,7 +23,6 @@ import (
 	"github.com/asim/go-micro/v3/server"
 	"github.com/asim/go-micro/v3/util/addr"
 	"github.com/asim/go-micro/v3/util/backoff"
-	mgrpc "github.com/asim/go-micro/v3/util/grpc"
 	mnet "github.com/asim/go-micro/v3/util/net"
 	"github.com/golang/protobuf/proto"
 	"golang.org/x/net/netutil"
@@ -211,7 +210,7 @@ func (g *grpcServer) handler(srv interface{}, stream grpc.ServerStream) (err err
 		return status.Errorf(codes.Internal, "method does not exist in context")
 	}
 
-	serviceName, methodName, err := mgrpc.ServiceMethod(fullMethod)
+	serviceName, methodName, err := ServiceMethod(fullMethod)
 	if err != nil {
 		return status.New(codes.InvalidArgument, err.Error()).Err()
 	}
@@ -278,7 +277,7 @@ func (g *grpcServer) handler(srv interface{}, stream grpc.ServerStream) (err err
 
 		// create a client.Request
 		request := &rpcRequest{
-			service:     mgrpc.ServiceFromMethod(fullMethod),
+			service:     ServiceFromMethod(fullMethod),
 			contentType: ct,
 			method:      fmt.Sprintf("%s.%s", serviceName, methodName),
 			codec:       codec,

@@ -17,22 +17,17 @@ import (
 	"sync"
 	"time"
 
+	"github.com/asim/go-micro/v3/broker"
+	"github.com/asim/go-micro/v3/codec/json"
+	merr "github.com/asim/go-micro/v3/errors"
+	"github.com/asim/go-micro/v3/registry"
+	"github.com/asim/go-micro/v3/registry/memory"
+	maddr "github.com/asim/go-micro/v3/util/addr"
+	mnet "github.com/asim/go-micro/v3/util/net"
+	mls "github.com/asim/go-micro/v3/util/tls"
 	"github.com/google/uuid"
-	"github.com/micro/go-micro/v2/broker"
-	"github.com/micro/go-micro/v2/codec/json"
-	"github.com/micro/go-micro/v2/cmd"
-	merr "github.com/micro/go-micro/v2/errors"
-	"github.com/micro/go-micro/v2/registry"
-	"github.com/micro/go-micro/v2/registry/cache"
-	maddr "github.com/micro/go-micro/v2/util/addr"
-	mnet "github.com/micro/go-micro/v2/util/net"
-	mls "github.com/micro/go-micro/v2/util/tls"
 	"golang.org/x/net/http2"
 )
-
-func init() {
-	cmd.DefaultBrokers["http"] = NewBroker
-}
 
 // HTTP Broker is a point to point async broker
 type httpBroker struct {
@@ -64,15 +59,10 @@ type httpSubscriber struct {
 	hb    *httpBroker
 }
 
-type httpEvent struct {
-	m   *broker.Message
-	t   string
-	err error
-}
-
 var (
-	DefaultSubPath   = "/_sub"
-	serviceName      = "go.micro.http.broker"
+	DefaultPath      = "/"
+	DefaultAddress   = "127.0.0.1:0"
+	serviceName      = "micro.http.broker"
 	broadcastVersion = "ff.http.broadcast"
 	registerTTL      = time.Minute
 	registerInterval = time.Second * 30
@@ -116,7 +106,7 @@ func newHttpBroker(opts ...broker.Option) broker.Broker {
 	options := broker.Options{
 		Codec:    json.Marshaler{},
 		Context:  context.TODO(),
-		Registry: registry.DefaultRegistry,
+		Registry: memory.NewRegistry(),
 	}
 
 	for _, o := range opts {
@@ -124,7 +114,8 @@ func newHttpBroker(opts ...broker.Option) broker.Broker {
 	}
 
 	// set address
-	addr := ":0"
+	addr := DefaultAddress
+
 	if len(options.Addrs) > 0 && len(options.Addrs[0]) > 0 {
 		addr = options.Addrs[0]
 	}
@@ -142,7 +133,7 @@ func newHttpBroker(opts ...broker.Option) broker.Broker {
 	}
 
 	// specify the message handler
-	h.mux.Handle(DefaultSubPath, h)
+	h.mux.Handle(DefaultPath, h)
 
 	// get optional handlers
 	if h.opts.Context != nil {
@@ -155,22 +146,6 @@ func newHttpBroker(opts ...broker.Option) broker.Broker {
 	}
 
 	return h
-}
-
-func (h *httpEvent) Ack() error {
-	return nil
-}
-
-func (h *httpEvent) Error() error {
-	return h.err
-}
-
-func (h *httpEvent) Message() *broker.Message {
-	return h.m
-}
-
-func (h *httpEvent) Topic() string {
-	return h.t
 }
 
 func (h *httpSubscriber) Options() broker.SubscribeOptions {
@@ -307,30 +282,28 @@ func (h *httpBroker) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	b, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		errr := merr.InternalServerError("go.micro.broker", "Error reading request body: %v", err)
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(errr.Error()))
 		return
 	}
 
-	var m *broker.Message
-	if err = h.opts.Codec.Unmarshal(b, &m); err != nil {
+	var msg *broker.Message
+	if err = h.opts.Codec.Unmarshal(b, &msg); err != nil {
 		errr := merr.InternalServerError("go.micro.broker", "Error parsing request body: %v", err)
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(errr.Error()))
 		return
 	}
 
-	topic := m.Header[":topic"]
-	delete(m.Header, ":topic")
+	topic := msg.Header["Micro-Topic"]
 
 	if len(topic) == 0 {
 		errr := merr.InternalServerError("go.micro.broker", "Topic not found")
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(errr.Error()))
 		return
 	}
 
-	p := &httpEvent{m: m, t: topic}
 	id := req.Form.Get("id")
 
 	//nolint:prealloc
@@ -347,7 +320,7 @@ func (h *httpBroker) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	// execute the handler
 	for _, fn := range subs {
-		p.err = fn(p)
+		fn(msg)
 	}
 }
 
@@ -425,10 +398,10 @@ func (h *httpBroker) Connect() error {
 	// get registry
 	reg := h.opts.Registry
 	if reg == nil {
-		reg = registry.DefaultRegistry
+		reg = memory.NewRegistry()
 	}
 	// set cache
-	h.r = cache.New(reg)
+	h.r = reg
 
 	// set running
 	h.running = true
@@ -445,12 +418,6 @@ func (h *httpBroker) Disconnect() error {
 
 	h.Lock()
 	defer h.Unlock()
-
-	// stop cache
-	rc, ok := h.r.(cache.Cache)
-	if ok {
-		rc.Stop()
-	}
 
 	// exit and return err
 	ch := make(chan error)
@@ -488,16 +455,11 @@ func (h *httpBroker) Init(opts ...broker.Option) error {
 	// get registry
 	reg := h.opts.Registry
 	if reg == nil {
-		reg = registry.DefaultRegistry
-	}
-
-	// get cache
-	if rc, ok := h.r.(cache.Cache); ok {
-		rc.Stop()
+		reg = memory.NewRegistry()
 	}
 
 	// set registry
-	h.r = cache.New(reg)
+	h.r = reg
 
 	// reconfigure tls config
 	if c := h.opts.TLSConfig; c != nil {
@@ -524,7 +486,7 @@ func (h *httpBroker) Publish(topic string, msg *broker.Message, opts ...broker.P
 		m.Header[k] = v
 	}
 
-	m.Header[":topic"] = topic
+	m.Header["Micro-Topic"] = topic
 
 	// encode the message
 	b, err := h.opts.Codec.Marshal(m)
@@ -555,7 +517,7 @@ func (h *httpBroker) Publish(topic string, msg *broker.Message, opts ...broker.P
 		vals := url.Values{}
 		vals.Add("id", node.Id)
 
-		uri := fmt.Sprintf("%s://%s%s?%s", scheme, node.Address, DefaultSubPath, vals.Encode())
+		uri := fmt.Sprintf("%s://%s%s?%s", scheme, node.Address, DefaultPath, vals.Encode())
 		r, err := h.c.Post(uri, "application/json", bytes.NewReader(b))
 		if err != nil {
 			return err

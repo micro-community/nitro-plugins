@@ -13,7 +13,7 @@ import (
 	"github.com/asim/go-micro/v3/logger"
 	"github.com/asim/go-micro/v3/proxy"
 	"github.com/asim/go-micro/v3/server"
-	grpcc "github.com/micro/go-plugins/client/grpc/v3"
+	grpcc "github.com/asim/go-plugins/client/grpc/v3"
 	"google.golang.org/grpc"
 )
 
