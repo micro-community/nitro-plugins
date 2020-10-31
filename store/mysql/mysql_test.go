@@ -15,7 +15,7 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
+	if tr := os.Getenv("CI"); len(tr) > 0 {
 		os.Exit(0)
 	}
 

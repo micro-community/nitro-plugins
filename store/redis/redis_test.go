@@ -82,7 +82,7 @@ func Test_rkv_configure(t *testing.T) {
 }
 
 func Test_Store(t *testing.T) {
-	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
+	if tr := os.Getenv("CI"); len(tr) > 0 {
 		t.Skip()
 	}
 	r := new(rkv)

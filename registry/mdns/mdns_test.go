@@ -10,7 +10,7 @@ import (
 
 func TestMDNS(t *testing.T) {
 	// skip test in travis because of sendto: operation not permitted error
-	if travis := os.Getenv("TRAVIS"); travis == "true" {
+	if travis := os.Getenv("CI"); travis == "true" {
 		t.Skip()
 	}
 
@@ -56,7 +56,7 @@ func TestMDNS(t *testing.T) {
 		},
 	}
 
-	travis := os.Getenv("TRAVIS")
+	travis := os.Getenv("CI")
 
 	var opts []registry.Option
 
@@ -200,7 +200,7 @@ func TestEncoding(t *testing.T) {
 }
 
 func TestWatcher(t *testing.T) {
-	if travis := os.Getenv("TRAVIS"); travis == "true" {
+	if travis := os.Getenv("CI"); travis == "true" {
 		t.Skip()
 	}
 
@@ -275,7 +275,7 @@ func TestWatcher(t *testing.T) {
 		}
 	}
 
-	travis := os.Getenv("TRAVIS")
+	travis := os.Getenv("CI")
 
 	var opts []registry.Option
 

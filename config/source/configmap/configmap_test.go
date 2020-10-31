@@ -11,7 +11,7 @@ import (
 )
 
 func TestGetClient(t *testing.T) {
-	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
+	if tr := os.Getenv("CI"); len(tr) > 0 {
 		return
 	}
 
@@ -60,7 +60,7 @@ func TestGetClient(t *testing.T) {
 }
 
 func TestMakeMap(t *testing.T) {
-	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
+	if tr := os.Getenv("CI"); len(tr) > 0 {
 		return
 	}
 
@@ -131,7 +131,7 @@ func TestMakeMap(t *testing.T) {
 }
 
 func TestConfigmap_Read(t *testing.T) {
-	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
+	if tr := os.Getenv("CI"); len(tr) > 0 {
 		return
 	}
 
@@ -171,7 +171,7 @@ func TestConfigmap_Read(t *testing.T) {
 }
 
 func TestConfigmap_String(t *testing.T) {
-	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
+	if tr := os.Getenv("CI"); len(tr) > 0 {
 		return
 	}
 
@@ -183,7 +183,7 @@ func TestConfigmap_String(t *testing.T) {
 }
 
 func TestNewSource(t *testing.T) {
-	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
+	if tr := os.Getenv("CI"); len(tr) > 0 {
 		return
 	}
 

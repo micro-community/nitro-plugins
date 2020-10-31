@@ -36,7 +36,7 @@ func newRegistry(opts ...registry.Option) registry.Registry {
 }
 
 func TestGossipRegistryBroadcast(t *testing.T) {
-	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
+	if tr := os.Getenv("CI"); len(tr) > 0 {
 		t.Skip()
 	}
 
@@ -100,7 +100,7 @@ func TestGossipRegistryBroadcast(t *testing.T) {
 
 }
 func TestGossipRegistryRetry(t *testing.T) {
-	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
+	if tr := os.Getenv("CI"); len(tr) > 0 {
 		t.Skip()
 	}
 

@@ -11,7 +11,7 @@ import (
 )
 
 func TestCloudflare(t *testing.T) {
-	if len(os.Getenv("IN_TRAVIS_CI")) != 0 {
+	if len(os.Getenv("CI")) != 0 {
 		t.Skip()
 	}
 
@@ -35,7 +35,7 @@ func TestCloudflare(t *testing.T) {
 	if err != nil {
 		t.Fatalf("List: %s\n", err.Error())
 	} else {
-		if len(os.Getenv("IN_TRAVIS_CI")) == 0 {
+		if len(os.Getenv("CI")) == 0 {
 			t.Log("Listed " + strconv.Itoa(len(records)) + " records")
 		}
 	}

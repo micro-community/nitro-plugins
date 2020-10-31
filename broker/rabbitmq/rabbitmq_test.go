@@ -18,7 +18,7 @@ func (e *Example) Handler(ctx context.Context, r interface{}) error {
 }
 
 func TestDurable(t *testing.T) {
-	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
+	if tr := os.Getenv("CI"); len(tr) > 0 {
 		t.Skip()
 	}
 	rabbitmq.DefaultRabbitURL = "amqp://rabbitmq:rabbitmq@127.0.0.1:5672"
