@@ -13,16 +13,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/google/uuid"
+	proto "github.com/asim/nitro-plugins/broker/grpc/v3/proto"
 	"github.com/asim/nitro/v3/broker"
 	merr "github.com/asim/nitro/v3/errors"
 	log "github.com/asim/nitro/v3/logger"
 	"github.com/asim/nitro/v3/registry"
-	"github.com/asim/nitro/v3/registry/cache"
+	mreg "github.com/asim/nitro/v3/registry/memory"
 	maddr "github.com/asim/nitro/v3/util/addr"
 	mnet "github.com/asim/nitro/v3/util/net"
 	mls "github.com/asim/nitro/v3/util/tls"
-	proto "github.com/asim/nitro-plugins/broker/grpc/v3/proto"
+	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -99,7 +99,7 @@ func newGRPCBroker(opts ...broker.Option) broker.Broker {
 	// get registry
 	reg, ok := options.Context.Value(registryKey).(registry.Registry)
 	if !ok {
-		reg = registry.DefaultRegistry
+		reg = mreg.NewRegistry()
 	}
 
 	h := &grpcBroker{
@@ -157,14 +157,12 @@ func (h *grpcHandler) Publish(ctx context.Context, msg *proto.Message) (*proto.E
 		Body:   msg.Body,
 	}
 
-	p := &grpcEvent{m: m, t: msg.Topic}
-
 	h.g.RLock()
 	for _, subscriber := range h.g.subscribers[msg.Topic] {
 		if msg.Id == subscriber.id {
 			// sub is sync; crufty rate limiting
 			// so we don't hose the cpu
-			p.err = subscriber.fn(p)
+			subscriber.fn(m)
 		}
 	}
 	h.g.RUnlock()
@@ -311,10 +309,10 @@ func (h *grpcBroker) Connect() error {
 	// get registry
 	reg, ok := h.opts.Context.Value(registryKey).(registry.Registry)
 	if !ok {
-		reg = registry.DefaultRegistry
+		reg = mreg.NewRegistry()
 	}
 	// set cache
-	h.r = cache.New(reg)
+	h.r = reg
 
 	// set running
 	h.running = true
@@ -331,12 +329,6 @@ func (h *grpcBroker) Disconnect() error {
 
 	h.Lock()
 	defer h.Unlock()
-
-	// stop cache
-	rc, ok := h.r.(cache.Cache)
-	if ok {
-		rc.Stop()
-	}
 
 	// exit and return err
 	ch := make(chan error)
@@ -374,16 +366,11 @@ func (h *grpcBroker) Init(opts ...broker.Option) error {
 	// get registry
 	reg, ok := h.opts.Context.Value(registryKey).(registry.Registry)
 	if !ok {
-		reg = registry.DefaultRegistry
-	}
-
-	// get cache
-	if rc, ok := h.r.(cache.Cache); ok {
-		rc.Stop()
+		reg = mreg.NewRegistry()
 	}
 
 	// set registry
-	h.r = cache.New(reg)
+	h.r = reg
 
 	return nil
 }
