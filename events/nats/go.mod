@@ -1,4 +1,4 @@
-module github.com/asim/nitro-plugins/events/stream/nats/v3
+module github.com/asim/nitro-plugins/events/nats/v3
 
 go 1.15
 
