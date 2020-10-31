@@ -1,4 +1,4 @@
-module github.com/asim/go-plugins/client/grpc/v3
+module github.com/asim/nitro-plugins/client/grpc/v3
 
 go 1.15
 
