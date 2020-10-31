@@ -3,7 +3,7 @@ package kubernetes
 import (
 	"github.com/asim/nitro/v3/logger"
 	"github.com/asim/nitro/v3/runtime"
-	"github.com/asim/go-plugins/runtime/kubernetes/v3/client"
+	"github.com/asim/nitro-plugins/runtime/kubernetes/v3/client"
 )
 
 // createNetworkPolicy creates a networkpolicy resource

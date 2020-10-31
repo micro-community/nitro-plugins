@@ -14,7 +14,6 @@ import (
 	"github.com/asim/nitro/v3/codec"
 	"github.com/asim/nitro/v3/codec/jsonrpc"
 	"github.com/asim/nitro/v3/codec/protorpc"
-	"github.com/asim/nitro/v3/cmd"
 	log "github.com/asim/nitro/v3/logger"
 	"github.com/asim/nitro/v3/registry"
 	"github.com/asim/nitro/v3/server"
@@ -39,10 +38,6 @@ type httpServer struct {
 	subscribers  map[*httpSubscriber][]broker.Subscriber
 	// used for first registration
 	registered bool
-}
-
-func init() {
-	cmd.DefaultServers["http"] = NewServer
 }
 
 func (h *httpServer) newCodec(contentType string) (codec.NewCodec, error) {

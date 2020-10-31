@@ -1,4 +1,4 @@
-module github.com/asim/go-plugins/cache/memcache/v3
+module github.com/asim/nitro-plugins/cache/memcache/v3
 
 go 1.15
 

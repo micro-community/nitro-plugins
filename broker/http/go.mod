@@ -1,4 +1,4 @@
-module github.com/asim/go-plugins/broker/http/v3
+module github.com/asim/nitro-plugins/broker/http/v3
 
 go 1.15
 

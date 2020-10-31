@@ -1,4 +1,4 @@
-module github.com/asim/go-plugins/config/source/etcd/v3
+module github.com/asim/nitro-plugins/config/source/etcd/v3
 
 go 1.15
 

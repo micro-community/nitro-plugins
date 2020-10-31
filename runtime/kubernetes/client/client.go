@@ -17,7 +17,7 @@ import (
 
 	"github.com/asim/nitro/v3/logger"
 	"github.com/asim/nitro/v3/runtime"
-	"github.com/asim/go-plugins/runtime/kubernetes/v3/api"
+	"github.com/asim/nitro-plugins/runtime/kubernetes/v3/api"
 )
 
 var (

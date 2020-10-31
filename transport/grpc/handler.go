@@ -6,7 +6,7 @@ import (
 	"github.com/asim/nitro/v3/errors"
 	"github.com/asim/nitro/v3/logger"
 	"github.com/asim/nitro/v3/transport"
-	pb "github.com/asim/go-plugins/transport/grpc/v3/proto"
+	pb "github.com/asim/nitro-plugins/transport/grpc/v3/proto"
 	"google.golang.org/grpc/peer"
 )
 

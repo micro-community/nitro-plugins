@@ -1,4 +1,4 @@
-module github.com/asim/go-plugins/store/cockroach/v3
+module github.com/asim/nitro-plugins/store/cockroach/v3
 
 go 1.15
 

@@ -1,4 +1,4 @@
-module github.com/asim/go-plugins/registry/mdns
+module github.com/asim/nitro-plugins/registry/mdns
 
 go 1.15
 

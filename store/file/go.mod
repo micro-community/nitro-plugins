@@ -1,4 +1,4 @@
-module github.com/asim/go-plugins/store/file
+module github.com/asim/nitro-plugins/store/file
 
 go 1.15
 

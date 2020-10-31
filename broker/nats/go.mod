@@ -1,4 +1,4 @@
-module github.com/asim/go-plugins/broker/nats/v3
+module github.com/asim/nitro-plugins/broker/nats/v3
 
 go 1.15
 

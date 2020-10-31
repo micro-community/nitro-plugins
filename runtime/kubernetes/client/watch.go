@@ -7,7 +7,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/asim/go-plugins/runtime/kubernetes/v3/api"
+	"github.com/asim/nitro-plugins/runtime/kubernetes/v3/api"
 )
 
 const (

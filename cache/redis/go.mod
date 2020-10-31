@@ -1,4 +1,4 @@
-module github.com/asim/go-plugins/cache/redis/v3
+module github.com/asim/nitro-plugins/cache/redis/v3
 
 go 1.15
 

@@ -13,7 +13,7 @@ import (
 	"github.com/asim/nitro/v3/logger"
 	"github.com/asim/nitro/v3/proxy"
 	"github.com/asim/nitro/v3/server"
-	grpcc "github.com/asim/go-plugins/client/grpc/v3"
+	grpcc "github.com/asim/nitro-plugins/client/grpc/v3"
 	"google.golang.org/grpc"
 )
 

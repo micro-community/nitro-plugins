@@ -1,4 +1,4 @@
-module github.com/asim/go-plugins/registry/zookeeper/v3
+module github.com/asim/nitro-plugins/registry/zookeeper/v3
 
 go 1.15
 

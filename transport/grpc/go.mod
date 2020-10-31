@@ -1,4 +1,4 @@
-module github.com/asim/go-plugins/transport/grpc/v3
+module github.com/asim/nitro-plugins/transport/grpc/v3
 
 go 1.13
 

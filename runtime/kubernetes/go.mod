@@ -1,4 +1,4 @@
-module github.com/asim/go-plugins/runtime/kubernetes/v3
+module github.com/asim/nitro-plugins/runtime/kubernetes/v3
 
 go 1.15
 
