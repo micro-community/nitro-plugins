@@ -6,13 +6,13 @@ package kubernetes
 
 import (
 	"bufio"
+	"fmt"
 	"strconv"
 	"time"
 
 	"github.com/asim/nitro/v3/errors"
 	"github.com/asim/nitro/v3/runtime"
 	"github.com/asim/nitro-plugins/runtime/kubernetes/v3/client"
-	"github.com/asim/nitro/v3/util/log"
 )
 
 type klog struct {
@@ -179,7 +179,7 @@ func (k *klog) Stream() (runtime.Logs, error) {
 		go func(podName string) {
 			err := k.podLogs(podName, stream)
 			if err != nil {
-				log.Errorf("Error streaming from pod: %v", err)
+				fmt.Printf("Error streaming from pod: %v\n", err)
 			}
 		}(pod)
 	}
