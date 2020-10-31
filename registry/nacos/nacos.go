@@ -15,17 +15,12 @@ import (
 	mnet "github.com/asim/nitro/v3/util/net"
 	"github.com/nacos-group/nacos-sdk-go/clients/naming_client"
 
-	"github.com/asim/nitro/v3/config/cmd"
 	"github.com/asim/nitro/v3/registry"
 )
 
 type nacosRegistry struct {
 	namingClient naming_client.INamingClient
 	opts         registry.Options
-}
-
-func init() {
-	cmd.DefaultRegistries["nacos"] = NewRegistry
 }
 
 func getNodeIpPort(s *registry.Service) (host string, port int, err error) {
