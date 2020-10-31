@@ -25,7 +25,6 @@ Contents of this repository:
 | Selector  | Load balancing; Label, Cache, Static                            |
 | Server    | RPC Servers; gRPC, HTTP                                         |
 | Transport | Bidirectional Streaming; NATS, RabbitMQ                         | 
-| Wrapper   | Middleware; Circuit Breakers, Rate Limiting, Tracing, Monitoring|
 
 ## Usage
 
