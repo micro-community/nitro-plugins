@@ -14,17 +14,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/micro/go-micro/v2/broker"
-	"github.com/micro/go-micro/v2/client"
-	"github.com/micro/go-micro/v2/cmd"
-	"github.com/micro/go-micro/v2/codec"
-	raw "github.com/micro/go-micro/v2/codec/bytes"
-	errors "github.com/micro/go-micro/v2/errors"
-	"github.com/micro/go-micro/v2/metadata"
-	"github.com/micro/go-micro/v2/registry"
-	"github.com/micro/go-micro/v2/router"
-	"github.com/micro/go-micro/v2/selector"
-	"github.com/micro/go-micro/v2/transport"
+	"github.com/asim/nitro/v3/broker"
+	"github.com/asim/nitro/v3/client"
+	"github.com/asim/nitro/v3/cmd"
+	"github.com/asim/nitro/v3/codec"
+	raw "github.com/asim/nitro/v3/codec/bytes"
+	errors "github.com/asim/nitro/v3/errors"
+	"github.com/asim/nitro/v3/metadata"
+	"github.com/asim/nitro/v3/registry"
+	"github.com/asim/nitro/v3/router"
+	"github.com/asim/nitro/v3/selector"
+	"github.com/asim/nitro/v3/transport"
 )
 
 func filterLabel(r []router.Route) []router.Route {

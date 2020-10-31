@@ -2,7 +2,7 @@
 
 set -x
 
-mod="github.com/micro/go-plugins"
+mod="github.com/asim/nitro-plugins"
 PKGS=""
 for d in $(find * -name 'go.mod'); do
   pushd $(dirname $d) >/dev/null
@@ -10,7 +10,7 @@ for d in $(find * -name 'go.mod'); do
   #go test -race -v ./... || :
   go test -v ./...
   popd >/dev/null
-#  PKGS=" $PKGS ${mod}/$(dirname $d)/v2"
+#  PKGS=" $PKGS ${mod}/$(dirname $d)/v3"
 done
 
 #go test -race -v $PKGS || :

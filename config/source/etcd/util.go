@@ -3,7 +3,7 @@ package etcd
 import (
 	"strings"
 
-	"github.com/asim/go-micro/v3/config/encoder"
+	"github.com/asim/nitro/v3/config/encoder"
 	"go.etcd.io/etcd/clientv3"
 	"go.etcd.io/etcd/mvcc/mvccpb"
 )

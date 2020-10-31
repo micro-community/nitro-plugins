@@ -9,8 +9,8 @@ to create a HTTP Server that could potentially be used for REST based API servic
 import (
 	"net/http"
 
-	"github.com/micro/go-micro/server"
-	httpServer "github.com/micro/go-plugins/server/http"
+	"github.com/asim/nitro/server"
+	httpServer "github.com/asim/nitro-plugins/server/http"
 )
 
 func main() {
@@ -37,9 +37,9 @@ Or as part of a service
 import (
 	"net/http"
 
-	"github.com/micro/go-micro/v2"
-	"github.com/micro/go-micro/server"
-	httpServer "github.com/micro/go-plugins/server/http"
+	"github.com/asim/nitro/v3"
+	"github.com/asim/nitro/server"
+	httpServer "github.com/asim/nitro-plugins/server/http"
 )
 
 func main() {

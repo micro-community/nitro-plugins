@@ -15,8 +15,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/asim/go-micro/v3/logger"
-	"github.com/asim/go-micro/v3/runtime"
+	"github.com/asim/nitro/v3/logger"
+	"github.com/asim/nitro/v3/runtime"
 	"github.com/asim/go-plugins/runtime/kubernetes/v3/api"
 )
 
@@ -26,7 +26,7 @@ var (
 	// ErrReadNamespace is returned when the names could not be read from service account
 	ErrReadNamespace = errors.New("Could not read namespace from service account secret")
 	// DefaultImage is default micro image
-	DefaultImage = "micro/go-micro"
+	DefaultImage = "asim/nitro"
 	// DefaultNamespace is the default k8s namespace
 	DefaultNamespace = "default"
 	// DefaultPort to expose on a service

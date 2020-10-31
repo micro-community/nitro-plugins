@@ -10,12 +10,12 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/micro/go-micro/v2/client"
-	"github.com/micro/go-micro/v2/registry"
-	"github.com/micro/go-micro/v2/registry/memory"
-	"github.com/micro/go-micro/v2/router"
-	rrouter "github.com/micro/go-micro/v2/router/registry"
-	"github.com/micro/go-plugins/client/http/v2/test"
+	"github.com/asim/nitro/v3/client"
+	"github.com/asim/nitro/v3/registry"
+	"github.com/asim/nitro/v3/registry/memory"
+	"github.com/asim/nitro/v3/router"
+	rrouter "github.com/asim/nitro/v3/router/registry"
+	"github.com/asim/nitro-plugins/client/http/v3/test"
 )
 
 func TestHTTPClient(t *testing.T) {

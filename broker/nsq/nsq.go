@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/micro/go-micro/v2/broker"
-	"github.com/micro/go-micro/v2/cmd"
-	"github.com/micro/go-micro/v2/codec/json"
+	"github.com/asim/nitro/v3/broker"
+	"github.com/asim/nitro/v3/cmd"
+	"github.com/asim/nitro/v3/codec/json"
 	"github.com/nsqio/go-nsq"
 )
 

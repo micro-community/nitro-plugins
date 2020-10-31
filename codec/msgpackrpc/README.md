@@ -7,10 +7,10 @@ Import the codec and set within the client/server
 package main
 
 import (
-    "github.com/micro/go-plugins/codec/msgpackrpc"
-    "github.com/micro/go-micro/v2"
-    "github.com/micro/go-micro/client"
-    "github.com/micro/go-micro/server"
+    "github.com/asim/nitro-plugins/codec/msgpackrpc"
+    "github.com/asim/nitro/v3"
+    "github.com/asim/nitro/client"
+    "github.com/asim/nitro/server"
 )
 
 func main() {

@@ -4,15 +4,15 @@ import (
 	reflect "reflect"
 	"sync"
 
-	mnet "github.com/micro/go-micro/v2/util/net"
+	mnet "github.com/asim/nitro/v3/util/net"
 
-	"github.com/micro/go-micro/v2/logger"
+	"github.com/asim/nitro/v3/logger"
 
 	"github.com/nacos-group/nacos-sdk-go/model"
 
 	"github.com/nacos-group/nacos-sdk-go/vo"
 
-	"github.com/micro/go-micro/v2/registry"
+	"github.com/asim/nitro/v3/registry"
 )
 
 type nacosWatcher struct {

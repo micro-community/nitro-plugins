@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/asim/go-micro/v3/broker"
-	"github.com/asim/go-micro/v3/registry"
-	"github.com/asim/go-micro/v3/registry/memory"
+	"github.com/asim/nitro/v3/broker"
+	"github.com/asim/nitro/v3/registry"
+	"github.com/asim/nitro/v3/registry/memory"
 	"github.com/google/uuid"
 )
 

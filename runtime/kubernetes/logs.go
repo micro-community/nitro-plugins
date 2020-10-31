@@ -1,4 +1,4 @@
-// Package kubernetes taken from https://github.com/asim/go-micro/blob/master/debug/log/kubernetes/kubernetes.go
+// Package kubernetes taken from https://github.com/asim/nitro/blob/master/debug/log/kubernetes/kubernetes.go
 // There are some modifications compared to the other files as
 // this package doesn't provide write functionality.
 // With the write functionality gone, structured logs also go away.
@@ -9,10 +9,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/asim/go-micro/v3/errors"
-	"github.com/asim/go-micro/v3/runtime"
+	"github.com/asim/nitro/v3/errors"
+	"github.com/asim/nitro/v3/runtime"
 	"github.com/asim/go-plugins/runtime/kubernetes/v3/client"
-	"github.com/asim/go-micro/v3/util/log"
+	"github.com/asim/nitro/v3/util/log"
 )
 
 type klog struct {

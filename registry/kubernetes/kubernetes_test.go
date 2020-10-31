@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
-	log "github.com/micro/go-micro/v2/logger"
-	"github.com/micro/go-micro/v2/registry"
-	"github.com/micro/go-micro/v2/router"
-	"github.com/micro/go-plugins/registry/kubernetes/v2/client"
-	"github.com/micro/go-plugins/registry/kubernetes/v2/client/mock"
+	log "github.com/asim/nitro/v3/logger"
+	"github.com/asim/nitro/v3/registry"
+	"github.com/asim/nitro/v3/router"
+	"github.com/asim/nitro-plugins/registry/kubernetes/v3/client"
+	"github.com/asim/nitro-plugins/registry/kubernetes/v3/client/mock"
 )
 
 var (

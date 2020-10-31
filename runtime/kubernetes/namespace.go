@@ -3,8 +3,8 @@ package kubernetes
 import (
 	"strings"
 
-	"github.com/asim/go-micro/v3/logger"
-	"github.com/asim/go-micro/v3/runtime"
+	"github.com/asim/nitro/v3/logger"
+	"github.com/asim/nitro/v3/runtime"
 	"github.com/asim/go-plugins/runtime/kubernetes/v3/client"
 )
 

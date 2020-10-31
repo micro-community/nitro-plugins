@@ -3,7 +3,7 @@ package grpc
 import (
 	"crypto/tls"
 
-	"github.com/asim/go-micro/v3/service"
+	"github.com/asim/nitro/v3/service"
 	gc "github.com/asim/go-plugins/client/grpc/v3"
 	gs "github.com/asim/go-plugins/server/grpc/v3"
 )

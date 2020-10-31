@@ -11,8 +11,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/streadway/amqp"
 
-	"github.com/micro/go-micro/v2/cmd"
-	"github.com/micro/go-micro/v2/transport"
+	"github.com/asim/nitro/v3/cmd"
+	"github.com/asim/nitro/v3/transport"
 )
 
 const (

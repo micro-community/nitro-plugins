@@ -6,8 +6,8 @@ import (
 
 	"github.com/nacos-group/nacos-sdk-go/vo"
 
-	"github.com/micro/go-micro/v2/registry"
-	nacosMock "github.com/micro/go-plugins/registry/nacos/v2/mock"
+	"github.com/asim/nitro/v3/registry"
+	nacosMock "github.com/asim/nitro-plugins/registry/nacos/v3/mock"
 	"github.com/nacos-group/nacos-sdk-go/model"
 	"github.com/stretchr/testify/mock"
 

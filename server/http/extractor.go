@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/micro/go-micro/v2/registry"
-	"github.com/micro/go-micro/v2/server"
-	"github.com/micro/go-micro/v2/util/addr"
+	"github.com/asim/nitro/v3/registry"
+	"github.com/asim/nitro/v3/server"
+	"github.com/asim/nitro/v3/util/addr"
 )
 
 func serviceDef(opts server.Options) *registry.Service {

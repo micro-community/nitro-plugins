@@ -5,7 +5,7 @@ go 1.15
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
 
 require (
-	github.com/asim/go-micro/v3 v3.2.1-0.20201022122155-691ff2025fd5
+	github.com/asim/nitro/v3 v3.3.0
 	go.etcd.io/etcd v0.5.0-alpha.5.0.20200821141407-46a0a44f9539
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf // indirect

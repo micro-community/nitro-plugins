@@ -4,18 +4,18 @@ import (
 	"context"
 	"testing"
 
-	"github.com/micro/go-micro/v2/client"
-	microerr "github.com/micro/go-micro/v2/errors"
-	"github.com/micro/go-micro/v2/registry/memory"
-	"github.com/micro/go-micro/v2/router"
-	rrouter "github.com/micro/go-micro/v2/router/registry"
-	"github.com/micro/go-micro/v2/server"
+	"github.com/asim/nitro/v3/client"
+	microerr "github.com/asim/nitro/v3/errors"
+	"github.com/asim/nitro/v3/registry/memory"
+	"github.com/asim/nitro/v3/router"
+	rrouter "github.com/asim/nitro/v3/router/registry"
+	"github.com/asim/nitro/v3/server"
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/mocktracer"
 	"github.com/stretchr/testify/assert"
 
-	cli "github.com/micro/go-micro/v2/client"
-	srv "github.com/micro/go-micro/v2/server"
+	cli "github.com/asim/nitro/v3/client"
+	srv "github.com/asim/nitro/v3/server"
 )
 
 type Test interface {

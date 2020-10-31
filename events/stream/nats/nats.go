@@ -10,8 +10,8 @@ import (
 	stan "github.com/nats-io/stan.go"
 	"github.com/pkg/errors"
 
-	"github.com/asim/go-micro/v3/events"
-	"github.com/asim/go-micro/v3/logger"
+	"github.com/asim/nitro/v3/events"
+	"github.com/asim/nitro/v3/logger"
 )
 
 const (

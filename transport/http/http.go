@@ -2,8 +2,8 @@
 package http
 
 import (
-	"github.com/micro/go-micro/v2/cmd"
-	"github.com/micro/go-micro/v2/transport"
+	"github.com/asim/nitro/v3/cmd"
+	"github.com/asim/nitro/v3/transport"
 )
 
 func init() {

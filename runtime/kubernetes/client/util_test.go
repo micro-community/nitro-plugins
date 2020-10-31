@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/asim/go-micro/v3/runtime"
+	"github.com/asim/nitro/v3/runtime"
 )
 
 func TestTemplates(t *testing.T) {

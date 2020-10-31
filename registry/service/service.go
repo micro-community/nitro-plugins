@@ -2,9 +2,9 @@
 package service
 
 import (
-	"github.com/micro/go-micro/v2/cmd"
-	"github.com/micro/go-micro/v2/registry"
-	"github.com/micro/go-micro/v2/registry/service"
+	"github.com/asim/nitro/v3/cmd"
+	"github.com/asim/nitro/v3/registry"
+	"github.com/asim/nitro/v3/registry/service"
 )
 
 func init() {

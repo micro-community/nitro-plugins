@@ -9,7 +9,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/micro/go-micro/v2/logger"
+	"github.com/asim/nitro/v3/logger"
 )
 
 type zaplog struct {

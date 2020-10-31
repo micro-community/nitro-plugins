@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/asim/go-micro/v3/build"
+	"github.com/asim/nitro/v3/build"
 )
 
 type tarBuild struct{}

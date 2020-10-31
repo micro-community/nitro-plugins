@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/asim/go-micro/v3/router"
+	"github.com/asim/nitro/v3/router"
 	mdns "github.com/asim/go-plugins/registry/mdns/util"
 )
 

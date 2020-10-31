@@ -5,10 +5,10 @@ import (
 	"testing"
 
 	"github.com/afex/hystrix-go/hystrix"
-	"github.com/micro/go-micro/v2/client"
-	"github.com/micro/go-micro/v2/registry/memory"
-	"github.com/micro/go-micro/v2/router"
-	rrouter "github.com/micro/go-micro/v2/router/registry"
+	"github.com/asim/nitro/v3/client"
+	"github.com/asim/nitro/v3/registry/memory"
+	"github.com/asim/nitro/v3/router"
+	rrouter "github.com/asim/nitro/v3/router/registry"
 )
 
 func TestBreaker(t *testing.T) {

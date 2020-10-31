@@ -1,9 +1,9 @@
 package grpc
 
 import (
-	"github.com/asim/go-micro/v3/client"
-	"github.com/asim/go-micro/v3/server"
-	"github.com/asim/go-micro/v3/service"
+	"github.com/asim/nitro/v3/client"
+	"github.com/asim/nitro/v3/server"
+	"github.com/asim/nitro/v3/service"
 	gclient "github.com/asim/go-plugins/client/grpc/v3"
 	gserver "github.com/asim/go-plugins/server/grpc/v3"
 )

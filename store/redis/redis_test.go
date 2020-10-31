@@ -2,7 +2,7 @@ package redis
 
 import (
 	"github.com/go-redis/redis/v7"
-	"github.com/micro/go-micro/v2/store"
+	"github.com/asim/nitro/v3/store"
 	"os"
 	"testing"
 	"time"

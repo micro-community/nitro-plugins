@@ -5,19 +5,19 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/micro/go-micro/v2/client"
-	microerr "github.com/micro/go-micro/v2/errors"
-	"github.com/micro/go-micro/v2/registry/memory"
-	"github.com/micro/go-micro/v2/router"
-	rrouter "github.com/micro/go-micro/v2/router/registry"
-	"github.com/micro/go-micro/v2/server"
+	"github.com/asim/nitro/v3/client"
+	microerr "github.com/asim/nitro/v3/errors"
+	"github.com/asim/nitro/v3/registry/memory"
+	"github.com/asim/nitro/v3/router"
+	rrouter "github.com/asim/nitro/v3/router/registry"
+	"github.com/asim/nitro/v3/server"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/ext"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/mocktracer"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 
-	cli "github.com/micro/go-micro/v2/client"
-	srv "github.com/micro/go-micro/v2/server"
+	cli "github.com/asim/nitro/v3/client"
+	srv "github.com/asim/nitro/v3/server"
 )
 
 type Test interface {

@@ -2,9 +2,9 @@
 package memory
 
 import (
-	"github.com/micro/go-micro/v2/cmd"
-	"github.com/micro/go-micro/v2/transport"
-	"github.com/micro/go-micro/v2/transport/memory"
+	"github.com/asim/nitro/v3/cmd"
+	"github.com/asim/nitro/v3/transport"
+	"github.com/asim/nitro/v3/transport/memory"
 )
 
 func init() {

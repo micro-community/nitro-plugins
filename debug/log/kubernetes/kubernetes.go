@@ -1,4 +1,4 @@
-// Package kubernetes is a logger implementing (github.com/asim/go-micro/v3/debug/log).Log
+// Package kubernetes is a logger implementing (github.com/asim/nitro/v3/debug/log).Log
 package kubernetes
 
 import (
@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/asim/go-micro/v3/debug/log"
+	"github.com/asim/nitro/v3/debug/log"
 	"github.com/asim/go-plugins/runtime/kubernetes/v3/client"
 )
 

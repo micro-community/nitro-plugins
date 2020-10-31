@@ -10,11 +10,11 @@ import (
 	"testing"
 
 	metrics "github.com/VictoriaMetrics/metrics"
-	"github.com/micro/go-micro/v2/client"
-	"github.com/micro/go-micro/v2/registry/memory"
-	"github.com/micro/go-micro/v2/router"
-	rrouter "github.com/micro/go-micro/v2/router/registry"
-	"github.com/micro/go-micro/v2/server"
+	"github.com/asim/nitro/v3/client"
+	"github.com/asim/nitro/v3/registry/memory"
+	"github.com/asim/nitro/v3/router"
+	rrouter "github.com/asim/nitro/v3/router/registry"
+	"github.com/asim/nitro/v3/server"
 	"github.com/stretchr/testify/assert"
 )
 
