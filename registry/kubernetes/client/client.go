@@ -8,9 +8,9 @@ import (
 	"os"
 	"path"
 
-	log "github.com/asim/nitro/v3/logger"
 	"github.com/asim/nitro-plugins/registry/kubernetes/v3/client/api"
 	"github.com/asim/nitro-plugins/registry/kubernetes/v3/client/watch"
+	log "github.com/asim/nitro/v3/logger"
 )
 
 var (

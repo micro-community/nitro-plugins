@@ -9,11 +9,10 @@ import (
 	"testing"
 	"time"
 
-	log "github.com/asim/nitro/v3/logger"
-	"github.com/asim/nitro/v3/registry"
-	"github.com/asim/nitro/v3/router"
 	"github.com/asim/nitro-plugins/registry/kubernetes/v3/client"
 	"github.com/asim/nitro-plugins/registry/kubernetes/v3/client/mock"
+	log "github.com/asim/nitro/v3/logger"
+	"github.com/asim/nitro/v3/registry"
 )
 
 var (
@@ -421,45 +420,6 @@ func TestListServices(t *testing.T) {
 		t.Fatal("expected there to be no services")
 	}
 
-}
-
-func TestWatcher(t *testing.T) {
-	r := setupRegistry()
-	rtr := router.NewRouter(router.Registry(r))
-
-	// check that service is blank
-	if _, err := rtr.Lookup(router.QueryService("foo.service")); err != router.ErrRouteNotFound {
-		log.Fatal("expected selector.ErrNotFound")
-	}
-
-	// setup svc
-	svc1 := &registry.Service{Name: "foo.service", Version: "1"}
-	register(r, "pod-1", svc1)
-
-	if routes, err := rtr.Lookup(router.QueryService("foo.service")); err != nil {
-		t.Fatalf("Querying service returned an error: %v", err)
-	} else if len(routes) != 1 {
-		t.Fatalf("Expected one route, found %v", len(routes))
-	}
-
-	// setup svc
-	svc2 := &registry.Service{Name: "foo.service", Version: "1"}
-	register(r, "pod-2", svc2)
-	time.Sleep(time.Millisecond * 100)
-
-	if routes, err := rtr.Lookup(router.QueryService("foo.service")); err != nil {
-		t.Fatalf("Querying service returned an error: %v", err)
-	} else if len(routes) != 2 {
-		t.Fatalf("Expected two routes, found %v", len(routes))
-	}
-
-	// remove pods
-	teardownRegistry()
-	time.Sleep(time.Millisecond * 100)
-
-	if _, err := rtr.Lookup(router.QueryService("foo.service")); err != router.ErrRouteNotFound {
-		log.Fatal("expected selector.ErrNotFound")
-	}
 }
 
 func hasNodes(a, b []*registry.Node) bool {
