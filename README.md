@@ -38,13 +38,14 @@ Import and set as options when creating a new service
 ```go
 import (
 	"github.com/asim/nitro/v3/service"
+	"github.com/asim/nitro-plugins/service/grpc/v3"
 	"github.com/asim/nitro-plugins/registry/kubernetes/v3"
 )
 
 func main() {
 	registry := kubernetes.NewRegistry()
 
-	nitro := service.NewService(
+	nitro := grpc.NewService(
 		service.Registry(registry),
 	)
 }
