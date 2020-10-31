@@ -6,6 +6,7 @@ import (
 
 	"github.com/afex/hystrix-go/hystrix"
 	"github.com/asim/nitro/v3/client"
+	"github.com/asim/nitro/v3/client/mucp"
 	"github.com/asim/nitro/v3/registry/memory"
 	"github.com/asim/nitro/v3/router"
 	rrouter "github.com/asim/nitro/v3/router/registry"
@@ -15,7 +16,7 @@ func TestBreaker(t *testing.T) {
 	// setup
 	registry := memory.NewRegistry()
 
-	c := client.NewClient(
+	c := mucp.NewClient(
 		// set the selector
 		client.Router(rrouter.NewRouter(router.Registry(registry))),
 		// add the breaker wrapper
