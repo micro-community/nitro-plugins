@@ -1,4 +1,4 @@
-module github.com/asim/go-plugins/server/grpc/v3
+module github.com/asim/nitro-plugins/server/grpc/v3
 
 go 1.15
 
@@ -8,3 +8,4 @@ require (
 	golang.org/x/net v0.0.0-20201021035429-f5854403a974
 	google.golang.org/grpc v1.27.0
 )
+

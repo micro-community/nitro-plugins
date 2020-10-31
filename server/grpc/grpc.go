@@ -14,9 +14,9 @@ import (
 	"sync"
 	"time"
 
+	pberr "github.com/asim/nitro-plugins/server/grpc/v3/proto"
 	"github.com/asim/nitro/v3/broker"
 	"github.com/asim/nitro/v3/errors"
-	pberr "github.com/asim/nitro/v3/errors/proto"
 	"github.com/asim/nitro/v3/logger"
 	meta "github.com/asim/nitro/v3/metadata"
 	"github.com/asim/nitro/v3/registry"
