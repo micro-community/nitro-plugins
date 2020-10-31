@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/asim/nitro/v3/broker"
+	log "github.com/asim/nitro/v3/logger"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/asim/nitro/v3/broker"
-	log "github.com/asim/nitro/v3/logger"
 )
 
 const (
@@ -121,24 +121,8 @@ func (s *subscriber) handleMessage(msg *sqs.Message, hdlr broker.Handler) {
 			Body:   decodeBody,
 		}
 
-		p := &publication{
-			sMessage:  msg,
-			m:         m,
-			URL:       s.URL,
-			queueName: s.queueName,
-			svc:       s.svc,
-		}
-
-		if p.err = hdlr(p); p.err != nil {
-			fmt.Println(p.err)
-		}
-		if s.options.AutoAck {
-			err := p.Ack()
-			if err != nil {
-				log.Errorf("Failed auto-acknowledge of message: %s", err.Error())
-			}
-		}
-
+		// handle
+		hdlr(m)
 	}
 
 }
@@ -255,7 +239,6 @@ func (b *sqsBroker) Subscribe(queueName string, h broker.Handler, opts ...broker
 	}
 
 	options := broker.SubscribeOptions{
-		AutoAck: true,
 		Queue:   queueName,
 		Context: context.Background(),
 	}
