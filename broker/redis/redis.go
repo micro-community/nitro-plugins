@@ -66,21 +66,9 @@ func (s *subscriber) recv() {
 				break
 			}
 
-			p := publication{
-				topic:   x.Channel,
-				message: &m,
-			}
-
 			// Handle error? Retry?
-			if p.err = s.handle(&p); p.err != nil {
+			if err := s.handle(&m); err != nil {
 				break
-			}
-
-			// Added for posterity, however Ack is a no-op.
-			if s.opts.AutoAck {
-				if err := p.Ack(); err != nil {
-					break
-				}
 			}
 
 		case redis.Subscription:

@@ -54,32 +54,16 @@ func (s *subscriber) run(hdlr broker.Handler) {
 			cancel()
 			return
 		default:
-			if err := s.sub.Receive(ctx, func(ctx context.Context, pm *pubsub.Message) {
+			s.sub.Receive(ctx, func(ctx context.Context, pm *pubsub.Message) {
 				// create broker message
 				m := &broker.Message{
 					Header: pm.Attributes,
 					Body:   pm.Data,
 				}
 
-				// create publication
-				p := &publication{
-					pm:    pm,
-					m:     m,
-					topic: s.topic,
-				}
-
 				// If the error is nil lets check if we should auto ack
-				p.err = hdlr(p)
-				if p.err == nil {
-					// auto ack?
-					if s.options.AutoAck {
-						p.Ack()
-					}
-				}
-			}); err != nil {
-				time.Sleep(time.Second)
-				continue
-			}
+				hdlr(m)
+			})
 		}
 	}
 }
@@ -170,7 +154,6 @@ func (b *pubsubBroker) Publish(topic string, msg *broker.Message, opts ...broker
 // Subscribe registers a subscription to the given topic against the google pubsub api
 func (b *pubsubBroker) Subscribe(topic string, h broker.Handler, opts ...broker.SubscribeOption) (broker.Subscriber, error) {
 	options := broker.SubscribeOptions{
-		AutoAck: true,
 		Queue:   "q-" + uuid.New().String(),
 		Context: b.options.Context,
 	}

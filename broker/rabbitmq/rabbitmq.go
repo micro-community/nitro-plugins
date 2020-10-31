@@ -111,7 +111,7 @@ func (s *subscriber) resubscribe() {
 			s.topic,
 			s.headers,
 			s.queueArgs,
-			s.opts.AutoAck,
+			true,
 			s.durableQueue,
 		)
 
@@ -177,9 +177,7 @@ func (r *rbroker) Subscribe(topic string, handler broker.Handler, opts ...broker
 		return nil, errors.New("not connected")
 	}
 
-	opt := broker.SubscribeOptions{
-		AutoAck: true,
-	}
+	opt := broker.SubscribeOptions{}
 
 	for _, o := range opts {
 		o(&opt)
@@ -195,9 +193,6 @@ func (r *rbroker) Subscribe(topic string, handler broker.Handler, opts ...broker
 		ctx = subscribeContext
 	}
 
-	var requeueOnError bool
-	requeueOnError, _ = ctx.Value(requeueOnErrorKey{}).(bool)
-
 	var durableQueue bool
 	durableQueue, _ = ctx.Value(durableQueueKey{}).(bool)
 
@@ -212,7 +207,6 @@ func (r *rbroker) Subscribe(topic string, handler broker.Handler, opts ...broker
 	}
 
 	if bval, ok := ctx.Value(ackSuccessKey{}).(bool); ok && bval {
-		opt.AutoAck = false
 		ackSuccess = true
 	}
 
@@ -225,12 +219,9 @@ func (r *rbroker) Subscribe(topic string, handler broker.Handler, opts ...broker
 			Header: header,
 			Body:   msg.Body,
 		}
-		p := &publication{d: msg, m: m, t: msg.RoutingKey}
-		p.err = handler(p)
-		if p.err == nil && ackSuccess && !opt.AutoAck {
+		err := handler(m)
+		if err == nil && ackSuccess {
 			msg.Ack(false)
-		} else if p.err != nil && !opt.AutoAck {
-			msg.Nack(false, requeueOnError)
 		}
 	}
 

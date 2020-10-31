@@ -130,22 +130,8 @@ func (s *subscriber) handleMessage(msg *sqs.Message, hdlr broker.Handler) {
 		Body:   []byte(*msg.Body),
 	}
 
-	p := &sqsEvent{
-		sMessage:  msg,
-		m:         m,
-		URL:       s.URL,
-		queueName: s.queueName,
-		svc:       s.svc,
-	}
-
-	if p.err = hdlr(p); p.err != nil {
-		fmt.Println(p.err)
-	}
-	if s.options.AutoAck {
-		err := p.Ack()
-		if err != nil {
-			logger.Errorf("Failed auto-acknowledge of message: %s", err.Error())
-		}
+	if err := hdlr(m); err != nil {
+		fmt.Println(err)
 	}
 }
 
@@ -292,7 +278,6 @@ func (b *awsServices) Subscribe(queueName string, h broker.Handler, opts ...brok
 	}
 
 	options := broker.SubscribeOptions{
-		AutoAck: true,
 		Queue:   queueName,
 		Context: context.Background(),
 	}

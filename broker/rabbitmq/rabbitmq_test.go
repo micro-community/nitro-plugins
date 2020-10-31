@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
-	micro "github.com/asim/nitro/v3"
 	broker "github.com/asim/nitro/v3/broker"
 	server "github.com/asim/nitro/v3/server"
+	"github.com/asim/nitro/v3/server/mucp"
 	rabbitmq "github.com/asim/nitro-plugins/broker/rabbitmq/v3"
 )
 
@@ -24,7 +24,6 @@ func TestDurable(t *testing.T) {
 	rabbitmq.DefaultRabbitURL = "amqp://rabbitmq:rabbitmq@127.0.0.1:5672"
 	brkrSub := broker.NewSubscribeOptions(
 		broker.Queue("queue.default"),
-		broker.DisableAutoAck(),
 		rabbitmq.DurableQueue(),
 	)
 
@@ -35,26 +34,17 @@ func TestDurable(t *testing.T) {
 		t.Skip()
 	}
 
-	s := server.NewServer(server.Broker(b))
-
-	service := micro.NewService(
-		micro.Server(s),
-		micro.Broker(b),
-	)
+	s := mucp.NewServer(server.Broker(b))
 	h := &Example{}
 	// Register a subscriber
-	micro.RegisterSubscriber(
+	s.Subscribe(s.NewSubscriber(
 		"topic",
-		service.Server(),
 		h.Handler,
 		server.SubscriberContext(brkrSub.Context),
 		server.SubscriberQueue("queue.default"),
-	)
+	))
 
 	//service.Init()
-
-	if err := service.Run(); err != nil {
-		t.Fatal(err)
-	}
+	s.Start()
 
 }

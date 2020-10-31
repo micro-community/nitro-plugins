@@ -156,9 +156,7 @@ func (r *rbroker) Subscribe(topic string, handler broker.Handler, opts ...broker
 
 	// Set options
 	stompOpt := make([]func(*frame.Frame) error, 0, len(opts))
-	bOpt := broker.SubscribeOptions{
-		AutoAck: true,
-	}
+	bOpt := broker.SubscribeOptions{}
 	for _, o := range opts {
 		o(&bOpt)
 	}
@@ -183,16 +181,10 @@ func (r *rbroker) Subscribe(topic string, handler broker.Handler, opts ...broker
 	}
 
 	if bval, ok := ctx.Value(ackSuccessKey{}).(bool); ok && bval {
-		bOpt.AutoAck = false
 		ackSuccess = true
 	}
 
-	var ackMode stomp.AckMode
-	if bOpt.AutoAck {
-		ackMode = stomp.AckAuto
-	} else {
-		ackMode = stomp.AckClientIndividual
-	}
+	ackMode := stomp.AckAuto
 
 	// Subscribe now
 	sub, err := r.stompConn.Subscribe(topic, ackMode, stompOpt...)
@@ -209,10 +201,9 @@ func (r *rbroker) Subscribe(topic string, handler broker.Handler, opts ...broker
 					Header: stompHeaderToMap(msg.Header),
 					Body:   msg.Body,
 				}
-				p := &publication{msg: msg, m: m, topic: topic, broker: r}
 				// Handle the publication
-				p.err = handler(p)
-				if p.err == nil && !bOpt.AutoAck && ackSuccess {
+				err = handler(m)
+				if err == nil && ackSuccess {
 					msg.Conn.Ack(msg)
 				}
 			}(msg)
