@@ -22,7 +22,6 @@ Contents of this repository:
 | Broker    | PubSub messaging; NATS, NSQ, RabbitMQ, Kafka                    |
 | Client    | RPC Clients; gRPC, HTTP                                         |
 | Codec     | Message Encoding; BSON, Mercury                                 |
-| Micro     | Micro Toolkit Plugins                                           |
 | Registry  | Service Discovery; Etcd, Gossip, NATS                           |
 | Selector  | Load balancing; Label, Cache, Static                            |
 | Server    | RPC Servers; gRPC, HTTP                                         |
