@@ -15,7 +15,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/asim/nitro/v3/broker"
-	"github.com/asim/nitro/v3/cmd"
 	merr "github.com/asim/nitro/v3/errors"
 	log "github.com/asim/nitro/v3/logger"
 	"github.com/asim/nitro/v3/registry"
@@ -71,8 +70,6 @@ var (
 
 func init() {
 	rand.Seed(time.Now().Unix())
-
-	cmd.DefaultBrokers["grpc"] = NewBroker
 }
 
 func newConfig(config *tls.Config) *tls.Config {

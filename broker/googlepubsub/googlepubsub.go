@@ -9,7 +9,6 @@ import (
 	"cloud.google.com/go/pubsub"
 	"github.com/google/uuid"
 	"github.com/asim/nitro/v3/broker"
-	"github.com/asim/nitro/v3/cmd"
 	log "github.com/asim/nitro/v3/logger"
 	"google.golang.org/api/option"
 	"google.golang.org/grpc/codes"
@@ -35,10 +34,6 @@ type publication struct {
 	m     *broker.Message
 	topic string
 	err   error
-}
-
-func init() {
-	cmd.DefaultBrokers["googlepubsub"] = NewBroker
 }
 
 func (s *subscriber) run(hdlr broker.Handler) {

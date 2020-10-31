@@ -12,7 +12,6 @@ import (
 
 	"github.com/asim/nitro-plugins/registry/kubernetes/v3/client"
 
-	"github.com/asim/nitro/v3/cmd"
 	"github.com/asim/nitro/v3/registry"
 )
 
@@ -45,10 +44,6 @@ var (
 // podSelector
 var podSelector = map[string]string{
 	labelTypeKey: labelTypeValueService,
-}
-
-func init() {
-	cmd.DefaultRegistries["kubernetes"] = NewRegistry
 }
 
 func configure(k *kregistry, opts ...registry.Option) error {

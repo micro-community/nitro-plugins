@@ -11,12 +11,7 @@ import (
 	"github.com/asim/nitro/v3/broker"
 	"github.com/asim/nitro/v3/codec"
 	"github.com/asim/nitro/v3/codec/json"
-	"github.com/asim/nitro/v3/cmd"
 )
-
-func init() {
-	cmd.DefaultBrokers["redis"] = NewBroker
-}
 
 // publication is an internal publication for the Redis broker.
 type publication struct {

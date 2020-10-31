@@ -12,7 +12,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/asim/nitro/v3/broker"
-	"github.com/asim/nitro/v3/cmd"
 	log "github.com/asim/nitro/v3/logger"
 )
 
@@ -45,10 +44,6 @@ type publication struct {
 	URL       string
 	queueName string
 	err       error
-}
-
-func init() {
-	cmd.DefaultBrokers["sqs"] = NewBroker
 }
 
 // run is designed to run as a goroutine and poll SQS for new messages. Note that it's possible to receive

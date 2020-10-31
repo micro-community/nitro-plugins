@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/asim/nitro/v3/broker"
-	"github.com/asim/nitro/v3/cmd"
 	"github.com/streadway/amqp"
 )
 
@@ -40,10 +39,6 @@ type publication struct {
 	m   *broker.Message
 	t   string
 	err error
-}
-
-func init() {
-	cmd.DefaultBrokers["rabbitmq"] = NewBroker
 }
 
 func (p *publication) Ack() error {

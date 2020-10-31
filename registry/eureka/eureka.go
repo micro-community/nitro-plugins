@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/hudl/fargo"
-	"github.com/asim/nitro/v3/cmd"
 	"github.com/asim/nitro/v3/registry"
 	"github.com/op/go-logging"
 )
@@ -32,7 +31,6 @@ type eurekaRegistry struct {
 }
 
 func init() {
-	cmd.DefaultRegistries["eureka"] = NewRegistry
 	logging.SetLevel(logging.ERROR, "fargo")
 }
 

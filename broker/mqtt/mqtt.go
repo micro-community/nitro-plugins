@@ -24,7 +24,6 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/asim/nitro/v3/broker"
 	"github.com/asim/nitro/v3/codec/json"
-	"github.com/asim/nitro/v3/cmd"
 	log "github.com/asim/nitro/v3/logger"
 )
 
@@ -35,7 +34,6 @@ type mqttBroker struct {
 }
 
 func init() {
-	cmd.DefaultBrokers["mqtt"] = NewBroker
 	rand.Seed(time.Now().UnixNano())
 }
 

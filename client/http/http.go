@@ -16,7 +16,6 @@ import (
 
 	"github.com/asim/nitro/v3/broker"
 	"github.com/asim/nitro/v3/client"
-	"github.com/asim/nitro/v3/cmd"
 	"github.com/asim/nitro/v3/codec"
 	raw "github.com/asim/nitro/v3/codec/bytes"
 	errors "github.com/asim/nitro/v3/errors"
@@ -35,10 +34,6 @@ func filterLabel(r []router.Route) []router.Route {
 type httpClient struct {
 	once sync.Once
 	opts client.Options
-}
-
-func init() {
-	cmd.DefaultClients["http"] = NewClient
 }
 
 func (h *httpClient) call(ctx context.Context, node *registry.Node, req client.Request, rsp interface{}, opts client.CallOptions) error {

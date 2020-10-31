@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/asim/nitro/v3/broker"
-	"github.com/asim/nitro/v3/cmd"
 	"github.com/streadway/amqp"
 	"gocloud.dev/gcp"
 	"gocloud.dev/pubsub"
@@ -19,10 +18,6 @@ import (
 	"gocloud.dev/pubsub/mempubsub"
 	"gocloud.dev/pubsub/rabbitpubsub"
 )
-
-func init() {
-	cmd.DefaultBrokers["gocloud"] = NewBroker
-}
 
 type (
 	topicOpener func(string) *pubsub.Topic

@@ -12,17 +12,11 @@ import (
 	"github.com/go-stomp/stomp"
 	"github.com/go-stomp/stomp/frame"
 	"github.com/asim/nitro/v3/broker"
-	"github.com/asim/nitro/v3/cmd"
 )
 
 type rbroker struct {
 	opts      broker.Options
 	stompConn *stomp.Conn
-}
-
-// init registers the STOMP broker
-func init() {
-	cmd.DefaultBrokers["stomp"] = NewBroker
 }
 
 // stompHeaderToMap converts STOMP header to broker friendly header

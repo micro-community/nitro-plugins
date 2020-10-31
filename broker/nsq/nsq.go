@@ -10,7 +10,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/asim/nitro/v3/broker"
-	"github.com/asim/nitro/v3/cmd"
 	"github.com/asim/nitro/v3/codec/json"
 	"github.com/nsqio/go-nsq"
 )
@@ -53,7 +52,6 @@ var (
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
-	cmd.DefaultBrokers["nsq"] = NewBroker
 }
 
 func (n *nsqBroker) Init(opts ...broker.Option) error {

@@ -12,7 +12,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/asim/nitro/v3/broker"
 	"github.com/asim/nitro/v3/codec/json"
-	"github.com/asim/nitro/v3/cmd"
 	log "github.com/asim/nitro/v3/logger"
 	stan "github.com/nats-io/stan.go"
 )
@@ -44,10 +43,6 @@ type publication struct {
 	msg *stan.Msg
 	m   *broker.Message
 	err error
-}
-
-func init() {
-	cmd.DefaultBrokers["stan"] = NewBroker
 }
 
 func (n *publication) Topic() string {

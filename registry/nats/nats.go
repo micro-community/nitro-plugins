@@ -8,7 +8,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/asim/nitro/v3/cmd"
 	"github.com/asim/nitro/v3/registry"
 	"github.com/nats-io/nats.go"
 )
@@ -30,10 +29,6 @@ var (
 	defaultQueryTopic = "micro.registry.nats.query"
 	defaultWatchTopic = "micro.registry.nats.watch"
 )
-
-func init() {
-	cmd.DefaultRegistries["nats"] = NewRegistry
-}
 
 func configure(n *natsRegistry, opts ...registry.Option) error {
 	for _, o := range opts {

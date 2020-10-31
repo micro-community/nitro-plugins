@@ -9,7 +9,6 @@ import (
 	"net"
 	"time"
 
-	"github.com/asim/nitro/v3/cmd"
 	log "github.com/asim/nitro/v3/logger"
 	"github.com/asim/nitro/v3/transport"
 	maddr "github.com/asim/nitro/v3/util/addr"
@@ -41,10 +40,6 @@ type tcpTransportSocket struct {
 type tcpTransportListener struct {
 	listener net.Listener
 	timeout  time.Duration
-}
-
-func init() {
-	cmd.DefaultTransports["tcp"] = NewTransport
 }
 
 func (t *tcpTransportClient) Local() string {
