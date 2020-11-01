@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/gomodule/redigo/redis"
-	"github.com/asim/go-micro/v3/cache"
+	"github.com/asim/nitro/v3/cache"
 	redisCluster "github.com/mna/redisc"
 )
 

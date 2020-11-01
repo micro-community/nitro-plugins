@@ -8,7 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/micro/go-micro/v2/config"
+	"github.com/asim/nitro/v3/config"
+	"github.com/asim/nitro/v3/config/memory"
 )
 
 func TestVaultMakeMap(t *testing.T) {
@@ -51,7 +52,7 @@ func TestVaultMakeMap(t *testing.T) {
 }
 
 func TestVault_Read(t *testing.T) {
-	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
+	if tr := os.Getenv("CI"); len(tr) > 0 {
 		t.Skip()
 	}
 
@@ -112,26 +113,36 @@ func TestVault_String(t *testing.T) {
 }
 
 func TestVaultNewSource(t *testing.T) {
-	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
+	if tr := os.Getenv("CI"); len(tr) > 0 {
 		t.Skip()
 	}
 
-	conf, err := config.NewConfig()
+	conf, err := memory.NewConfig(config.WithSource(
+		NewSource(
+			WithAddress("http://127.0.0.1"),
+			WithResourcePath("secret/data/db/auth"),
+			WithToken("s.Q4Zi0CSowXZl7sh0z96ijcT4"),
+		),
+	))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_ = conf.Load(NewSource(
-		WithAddress("http://127.0.0.1"),
-		WithResourcePath("secret/data/db/auth"),
-		WithToken("s.Q4Zi0CSowXZl7sh0z96ijcT4"),
-	))
-
-	if user := conf.Get("secret", "data", "db", "auth", "user").String("user"); user != "myuser" {
+	v, err := conf.Load("secret", "data", "db", "auth", "user")
+	if err != nil {
+		t.Fatal(err)
+	}
+	user := v.String("user")
+	if user != "myuser" {
 		t.Errorf("expected %v and got %v", "myuser", user)
 	}
 
-	if addr := conf.Get("secret", "data", "db", "auth", "host").String("host"); addr != "128.23.33.21" {
+	v, err = conf.Load("secret", "data", "db", "auth", "host")
+	if err != nil {
+		t.Fatal(err)
+	}
+	addr := v.String("host")
+	if addr != "128.23.33.21" {
 		t.Errorf("expected %v and got %v", "128.23.33.21", addr)
 	}
 }

@@ -10,10 +10,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/micro/go-micro/v2/broker"
-	"github.com/micro/go-micro/v2/codec/json"
-	"github.com/micro/go-micro/v2/cmd"
-	log "github.com/micro/go-micro/v2/logger"
+	"github.com/asim/nitro/v3/broker"
+	"github.com/asim/nitro/v3/codec/json"
+	log "github.com/asim/nitro/v3/logger"
 	stan "github.com/nats-io/stan.go"
 )
 
@@ -44,10 +43,6 @@ type publication struct {
 	msg *stan.Msg
 	m   *broker.Message
 	err error
-}
-
-func init() {
-	cmd.DefaultBrokers["stan"] = NewBroker
 }
 
 func (n *publication) Topic() string {
@@ -292,11 +287,7 @@ func (n *stanBroker) Subscribe(topic string, handler broker.Handler, opts ...bro
 	}
 	n.RUnlock()
 
-	var ackSuccess bool
-
-	opt := broker.SubscribeOptions{
-		AutoAck: true,
-	}
+	opt := broker.SubscribeOptions{}
 
 	for _, o := range opts {
 		o(&opt)
@@ -313,9 +304,6 @@ func (n *stanBroker) Subscribe(topic string, handler broker.Handler, opts ...bro
 	}
 
 	var stanOpts []stan.SubscriptionOption
-	if !opt.AutoAck {
-		stanOpts = append(stanOpts, stan.SetManualAckMode())
-	}
 
 	if subOpts, ok := ctx.Value(subscribeOptionKey{}).([]stan.SubscriptionOption); ok && len(subOpts) > 0 {
 		stanOpts = append(stanOpts, subOpts...)
@@ -323,7 +311,6 @@ func (n *stanBroker) Subscribe(topic string, handler broker.Handler, opts ...bro
 
 	if bval, ok := ctx.Value(ackSuccessKey{}).(bool); ok && bval {
 		stanOpts = append(stanOpts, stan.SetManualAckMode())
-		ackSuccess = true
 	}
 
 	bopts := stan.DefaultSubscriptionOptions
@@ -333,8 +320,6 @@ func (n *stanBroker) Subscribe(topic string, handler broker.Handler, opts ...bro
 		}
 	}
 
-	opt.AutoAck = !bopts.ManualAcks
-
 	if dn, ok := n.opts.Context.Value(durableKey{}).(string); ok && len(dn) > 0 {
 		stanOpts = append(stanOpts, stan.DurableName(dn))
 		bopts.DurableName = dn
@@ -342,20 +327,14 @@ func (n *stanBroker) Subscribe(topic string, handler broker.Handler, opts ...bro
 
 	fn := func(msg *stan.Msg) {
 		var m broker.Message
-		p := &publication{m: &m, msg: msg, t: msg.Subject}
 
 		// unmarshal message
 		if err := n.opts.Codec.Unmarshal(msg.Data, &m); err != nil {
-			p.err = err
-			p.m.Body = msg.Data
+			m.Body = msg.Data
 			return
 		}
 		// execute the handler
-		p.err = handler(p)
-		// if there's no error and success auto ack is enabled ack it
-		if p.err == nil && ackSuccess {
-			msg.Ack()
-		}
+		handler(&m)
 	}
 
 	var sub stan.Subscription

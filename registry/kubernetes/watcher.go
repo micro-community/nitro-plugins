@@ -6,10 +6,10 @@ import (
 	"strings"
 	"sync"
 
-	log "github.com/micro/go-micro/v2/logger"
-	"github.com/micro/go-micro/v2/registry"
-	"github.com/micro/go-plugins/registry/kubernetes/v2/client"
-	"github.com/micro/go-plugins/registry/kubernetes/v2/client/watch"
+	"github.com/asim/nitro-plugins/registry/kubernetes/v3/client"
+	"github.com/asim/nitro-plugins/registry/kubernetes/v3/client/watch"
+	log "github.com/asim/nitro/v3/logger"
+	"github.com/asim/nitro/v3/registry"
 )
 
 type k8sWatcher struct {

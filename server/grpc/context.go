@@ -3,7 +3,7 @@ package grpc
 import (
 	"context"
 
-	"github.com/asim/go-micro/v3/server"
+	"github.com/asim/nitro/v3/server"
 )
 
 func setServerOption(k, v interface{}) server.Option {

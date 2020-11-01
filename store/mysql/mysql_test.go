@@ -7,7 +7,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/micro/go-micro/v2/store"
+	"github.com/asim/nitro/v3/store"
 )
 
 var (
@@ -15,7 +15,7 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
+	if tr := os.Getenv("CI"); len(tr) > 0 {
 		os.Exit(0)
 	}
 

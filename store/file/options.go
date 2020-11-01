@@ -3,7 +3,7 @@ package file
 import (
 	"context"
 
-	"github.com/asim/go-micro/v3/store"
+	"github.com/asim/nitro/v3/store"
 )
 
 type dirKey struct{}

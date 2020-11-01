@@ -2,7 +2,7 @@ package redis
 
 import (
 	"github.com/go-redis/redis/v7"
-	"github.com/micro/go-micro/v2/store"
+	"github.com/asim/nitro/v3/store"
 	"os"
 	"testing"
 	"time"
@@ -82,7 +82,7 @@ func Test_rkv_configure(t *testing.T) {
 }
 
 func Test_Store(t *testing.T) {
-	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
+	if tr := os.Getenv("CI"); len(tr) > 0 {
 		t.Skip()
 	}
 	r := new(rkv)

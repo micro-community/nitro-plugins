@@ -7,7 +7,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/micro/go-micro/v2/broker"
+	"github.com/asim/nitro/v3/broker"
 )
 
 func subscribe(t *testing.T, b broker.Broker, topic string, handle broker.Handler) broker.Subscriber {
@@ -50,14 +50,12 @@ func TestBroker(t *testing.T) {
 	msgs := make(chan string, 10)
 
 	go func() {
-		s1 := subscribe(t, b, "test", func(p broker.Event) error {
-			m := p.Message()
+		s1 := subscribe(t, b, "test", func(m *broker.Message) error {
 			msgs <- fmt.Sprintf("s1:%s", string(m.Body))
 			return nil
 		})
 
-		s2 := subscribe(t, b, "test", func(p broker.Event) error {
-			m := p.Message()
+		s2 := subscribe(t, b, "test", func(m *broker.Message) error {
 			msgs <- fmt.Sprintf("s2:%s", string(m.Body))
 			return nil
 		})

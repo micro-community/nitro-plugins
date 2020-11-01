@@ -5,10 +5,10 @@ import (
 	"crypto/tls"
 	"net"
 
-	"github.com/asim/go-micro/v3/broker/http"
-	"github.com/asim/go-micro/v3/codec"
-	"github.com/asim/go-micro/v3/registry/memory"
-	"github.com/asim/go-micro/v3/server"
+	mbroker "github.com/asim/nitro/v3/broker/memory"
+	"github.com/asim/nitro/v3/codec"
+	"github.com/asim/nitro/v3/registry/memory"
+	"github.com/asim/nitro/v3/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/encoding"
 )
@@ -67,7 +67,7 @@ func newOptions(opt ...server.Option) server.Options {
 	opts := server.Options{
 		Codecs:           make(map[string]codec.NewCodec),
 		Metadata:         map[string]string{},
-		Broker:           http.NewBroker(),
+		Broker:           mbroker.NewBroker(),
 		Registry:         memory.NewRegistry(),
 		Address:          server.DefaultAddress,
 		Name:             server.DefaultName,

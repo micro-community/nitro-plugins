@@ -7,10 +7,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/asim/go-micro/v3/broker"
-	"github.com/asim/go-micro/v3/codec/json"
-	"github.com/asim/go-micro/v3/logger"
-	"github.com/asim/go-micro/v3/registry/memory"
+	"github.com/asim/nitro/v3/broker"
+	"github.com/asim/nitro/v3/codec/json"
+	"github.com/asim/nitro/v3/logger"
+	"github.com/asim/nitro/v3/registry/memory"
 	nats "github.com/nats-io/nats.go"
 )
 

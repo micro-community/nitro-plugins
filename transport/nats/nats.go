@@ -9,10 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/micro/go-micro/v2/codec/json"
-	"github.com/micro/go-micro/v2/cmd"
-	"github.com/micro/go-micro/v2/server"
-	"github.com/micro/go-micro/v2/transport"
+	"github.com/asim/nitro/v3/codec/json"
+	"github.com/asim/nitro/v3/server"
+	"github.com/asim/nitro/v3/transport"
 	"github.com/nats-io/nats.go"
 )
 
@@ -61,10 +60,6 @@ type ntportListener struct {
 var (
 	DefaultTimeout = time.Minute
 )
-
-func init() {
-	cmd.DefaultTransports["nats"] = NewTransport
-}
 
 func configure(n *ntport, opts ...transport.Option) {
 	for _, o := range opts {

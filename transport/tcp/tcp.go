@@ -9,12 +9,11 @@ import (
 	"net"
 	"time"
 
-	"github.com/micro/go-micro/v2/cmd"
-	log "github.com/micro/go-micro/v2/logger"
-	"github.com/micro/go-micro/v2/transport"
-	maddr "github.com/micro/go-micro/v2/util/addr"
-	mnet "github.com/micro/go-micro/v2/util/net"
-	mls "github.com/micro/go-micro/v2/util/tls"
+	log "github.com/asim/nitro/v3/logger"
+	"github.com/asim/nitro/v3/transport"
+	maddr "github.com/asim/nitro/v3/util/addr"
+	mnet "github.com/asim/nitro/v3/util/net"
+	mls "github.com/asim/nitro/v3/util/tls"
 )
 
 type tcpTransport struct {
@@ -41,10 +40,6 @@ type tcpTransportSocket struct {
 type tcpTransportListener struct {
 	listener net.Listener
 	timeout  time.Duration
-}
-
-func init() {
-	cmd.DefaultTransports["tcp"] = NewTransport
 }
 
 func (t *tcpTransportClient) Local() string {

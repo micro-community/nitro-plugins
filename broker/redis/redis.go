@@ -8,15 +8,10 @@ import (
 	"time"
 
 	"github.com/gomodule/redigo/redis"
-	"github.com/micro/go-micro/v2/broker"
-	"github.com/micro/go-micro/v2/codec"
-	"github.com/micro/go-micro/v2/codec/json"
-	"github.com/micro/go-micro/v2/cmd"
+	"github.com/asim/nitro/v3/broker"
+	"github.com/asim/nitro/v3/codec"
+	"github.com/asim/nitro/v3/codec/json"
 )
-
-func init() {
-	cmd.DefaultBrokers["redis"] = NewBroker
-}
 
 // publication is an internal publication for the Redis broker.
 type publication struct {
@@ -71,21 +66,9 @@ func (s *subscriber) recv() {
 				break
 			}
 
-			p := publication{
-				topic:   x.Channel,
-				message: &m,
-			}
-
 			// Handle error? Retry?
-			if p.err = s.handle(&p); p.err != nil {
+			if err := s.handle(&m); err != nil {
 				break
-			}
-
-			// Added for posterity, however Ack is a no-op.
-			if s.opts.AutoAck {
-				if err := p.Ack(); err != nil {
-					break
-				}
 			}
 
 		case redis.Subscription:

@@ -7,11 +7,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/micro/go-micro/v2/config"
+	"github.com/asim/nitro/v3/config"
+	"github.com/asim/nitro/v3/config/memory"
 )
 
 func TestGetClient(t *testing.T) {
-	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
+	if tr := os.Getenv("CI"); len(tr) > 0 {
 		return
 	}
 
@@ -60,7 +61,7 @@ func TestGetClient(t *testing.T) {
 }
 
 func TestMakeMap(t *testing.T) {
-	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
+	if tr := os.Getenv("CI"); len(tr) > 0 {
 		return
 	}
 
@@ -131,7 +132,7 @@ func TestMakeMap(t *testing.T) {
 }
 
 func TestConfigmap_Read(t *testing.T) {
-	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
+	if tr := os.Getenv("CI"); len(tr) > 0 {
 		return
 	}
 
@@ -171,7 +172,7 @@ func TestConfigmap_Read(t *testing.T) {
 }
 
 func TestConfigmap_String(t *testing.T) {
-	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
+	if tr := os.Getenv("CI"); len(tr) > 0 {
 		return
 	}
 
@@ -183,22 +184,34 @@ func TestConfigmap_String(t *testing.T) {
 }
 
 func TestNewSource(t *testing.T) {
-	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
+	if tr := os.Getenv("CI"); len(tr) > 0 {
 		return
 	}
 
-	conf, err := config.NewConfig()
+	conf, err := memory.NewConfig(
+		config.WithSource(NewSource()),
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	conf.Load(NewSource())
+	v, err := conf.Load("mongodb", "host")
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	if mongodbHost := conf.Get("mongodb", "host").String("localhost"); mongodbHost != "127.0.0.1" && mongodbHost != "localhost" {
+	mongodbHost := v.String("localhost")
+	if mongodbHost != "127.0.0.1" && mongodbHost != "localhost" {
 		t.Errorf("expected %v and got %v", "127.0.0.1", mongodbHost)
 	}
 
-	if configPort := conf.Get("config", "port").Int(1337); configPort != 1337 {
+	v, err = conf.Load("config", "port")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	configPort := v.Int(1337)
+	if configPort != 1337 {
 		t.Errorf("expected %v and got %v", "1337", configPort)
 	}
 }

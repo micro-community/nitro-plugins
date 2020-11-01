@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/micro/go-micro/v2/broker"
+	"github.com/asim/nitro/v3/broker"
 )
 
 func TestBroker(t *testing.T) {
@@ -40,9 +40,8 @@ func publishN(b broker.Broker, topic string, n int) error {
 
 func receiveN(b broker.Broker, topic string, n int, donec chan struct{}) (broker.Subscriber, error) {
 	r := 0
-	handler := func(p broker.Event) error {
+	handler := func(m *broker.Message) error {
 		r++
-		p.Ack()
 		if r >= n {
 			close(donec)
 		}

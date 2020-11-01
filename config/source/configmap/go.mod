@@ -1,18 +1,25 @@
-module github.com/micro/go-plugins/config/source/configmap/v2
+module github.com/asim/nitro-plugins/config/source/configmap/v3
 
 go 1.13
 
 require (
+	github.com/asim/nitro/v3 v3.3.0
+	github.com/gogo/protobuf v1.3.1 // indirect
+	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/googleapis/gnostic v0.4.0 // indirect
+	github.com/hashicorp/golang-lru v0.5.4 // indirect
+	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/kr/pretty v0.2.0 // indirect
-	github.com/micro/go-micro/v2 v2.9.1-0.20200716153311-f9bf56239306
+	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/oauth2 v0.0.0-20191202225959-858c2ad4c8b6 // indirect
+	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	k8s.io/api v0.0.0-00010101000000-000000000000
 	k8s.io/apimachinery v0.0.0-00010101000000-000000000000
 	k8s.io/client-go v0.0.0-00010101000000-000000000000
 	k8s.io/utils v0.0.0-20200109141947-94aeca20bf09 // indirect
+	sigs.k8s.io/yaml v1.2.0 // indirect
 )
 
 replace (

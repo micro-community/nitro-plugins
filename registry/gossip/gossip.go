@@ -16,11 +16,10 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/google/uuid"
 	"github.com/hashicorp/memberlist"
-	"github.com/micro/go-micro/v2/cmd"
-	log "github.com/micro/go-micro/v2/logger"
-	"github.com/micro/go-micro/v2/registry"
-	regutil "github.com/micro/go-micro/v2/util/registry"
-	pb "github.com/micro/go-plugins/registry/gossip/v2/proto"
+	log "github.com/asim/nitro/v3/logger"
+	"github.com/asim/nitro/v3/registry"
+	regutil "github.com/asim/nitro/v3/util/registry"
+	pb "github.com/asim/nitro-plugins/registry/gossip/v3/proto"
 	"github.com/mitchellh/hashstructure"
 )
 
@@ -79,10 +78,6 @@ type event struct {
 
 type eventDelegate struct {
 	events chan *event
-}
-
-func init() {
-	cmd.DefaultRegistries["gossip"] = NewRegistry
 }
 
 func (ed *eventDelegate) NotifyJoin(n *memberlist.Node) {

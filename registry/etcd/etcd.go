@@ -13,8 +13,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/asim/go-micro/v3/logger"
-	"github.com/asim/go-micro/v3/registry"
+	"github.com/asim/nitro/v3/logger"
+	"github.com/asim/nitro/v3/registry"
 	hash "github.com/mitchellh/hashstructure"
 	"go.etcd.io/etcd/clientv3"
 	"go.etcd.io/etcd/etcdserver/api/v3rpc/rpctypes"

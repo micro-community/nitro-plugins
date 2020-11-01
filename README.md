@@ -1,17 +1,16 @@
-# Plugins [![License](https://img.shields.io/:license-apache-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![GoDoc](https://godoc.org/github.com/micro/go-plugins?status.svg)](https://godoc.org/github.com/micro/go-plugins)
+# Nitro Plugins [![License](https://img.shields.io/:license-apache-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![GoDoc](https://godoc.org/github.com/asim/nitro-plugins?status.svg)](https://godoc.org/github.com/asim/nitro-plugins)
 
-Go plugins is a place for third party implementations of Go Micro interfaces.
+Nitro Plugins are third party and external infrastructure plugins for Nitro (formerly Go Micro).
 
 ## Overview
 
-Go Micro is built as a pluggable framework using Go interfaces. Plugins enable you to swap out the underlying infrastructure without having 
+Nitro is built as a pluggable framework using Go interfaces. Plugins enable you to swap out the underlying infrastructure without having 
 to rewrite all your code. This enables running the same software in multiple environments without a ton of work. Read further for more info.
 
 ## Getting Started
 
 * [Contents](#contents)
 * [Usage](#usage)
-* [Build](#build)
 
 ## Contents
 
@@ -22,73 +21,14 @@ Contents of this repository:
 | Broker    | PubSub messaging; NATS, NSQ, RabbitMQ, Kafka                    |
 | Client    | RPC Clients; gRPC, HTTP                                         |
 | Codec     | Message Encoding; BSON, Mercury                                 |
-| Micro     | Micro Toolkit Plugins                                           |
 | Registry  | Service Discovery; Etcd, Gossip, NATS                           |
 | Selector  | Load balancing; Label, Cache, Static                            |
 | Server    | RPC Servers; gRPC, HTTP                                         |
 | Transport | Bidirectional Streaming; NATS, RabbitMQ                         | 
-| Wrapper   | Middleware; Circuit Breakers, Rate Limiting, Tracing, Monitoring|
 
 ## Usage
 
-Plugins can be added to go-micro in the following ways. By doing so they'll be available to set via command line args or environment variables.
-
-Import the plugins in a `plugins.go` file
-
-```go
-package main
-
-import (
-	_ "github.com/micro/go-plugins/broker/rabbitmq/v2"
-	_ "github.com/micro/go-plugins/registry/kubernetes/v2"
-	_ "github.com/micro/go-plugins/transport/nats/v2"
-)
-```
-
-Create your service and ensure you call `service.Init`
-
-```go
-package main
-
-import (
-	"github.com/micro/go-micro/v2"
-)
-
-func main() {
-	service := micro.NewService(
-		// Set service name
-		micro.Name("my.service"),
-	)
-
-	// Parse CLI flags
-	service.Init()
-}
-```
-
-Build your service
-
-```
-go build -o service ./main.go ./plugins.go
-```
-
-### Environment Variables
-
-Use environment variables to set the
-
-```
-MICRO_BROKER=rabbitmq \
-MICRO_REGISTRY=kubernetes \ 
-MICRO_TRANSPORT=nats \ 
-./service
-```
-
-### Flags
-
-Or use command line flags to enable them
-
-```shell
-./service --broker=rabbitmq --registry=kubernetes --transport=nats
-```
+Plugins can be added to Nitro in the following ways.
 
 ### Options
 
@@ -96,51 +36,17 @@ Import and set as options when creating a new service
 
 ```go
 import (
-	"github.com/micro/go-micro/v2"
-	"github.com/micro/go-plugins/registry/kubernetes/v2"
+	"github.com/asim/nitro/v3/service"
+	"github.com/asim/nitro-plugins/service/grpc/v3"
+	"github.com/asim/nitro-plugins/registry/kubernetes/v3"
 )
 
 func main() {
-	registry := kubernetes.NewRegistry() //a default to using env vars for master API
+	registry := kubernetes.NewRegistry()
 
-	service := micro.NewService(
-		// Set service name
-		micro.Name("my.service"),
-		// Set service registry
-		micro.Registry(registry),
+	nitro := grpc.NewService(
+		service.Registry(registry),
 	)
 }
 ```
 
-## Build
-
-An anti-pattern is modifying the `main.go` file to include plugins. Best practice recommendation is to include
-plugins in a separate file and rebuild with it included. This allows for automation of building plugins and
-clean separation of concerns.
-
-Create file plugins.go
-
-```go
-package main
-
-import (
-	_ "github.com/micro/go-plugins/broker/rabbitmq/v2"
-	_ "github.com/micro/go-plugins/registry/kubernetes/v2"
-	_ "github.com/micro/go-plugins/transport/nats/v2"
-)
-```
-
-Build with plugins.go
-
-```shell
-go build -o service main.go plugins.go
-```
-
-Run with plugins
-
-```shell
-MICRO_BROKER=rabbitmq \
-MICRO_REGISTRY=kubernetes \
-MICRO_TRANSPORT=nats \
-service
-```

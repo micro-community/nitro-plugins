@@ -10,8 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/micro/go-micro/v2/broker"
-	"github.com/micro/go-micro/v2/cmd"
+	"github.com/asim/nitro/v3/broker"
 	"github.com/streadway/amqp"
 	"gocloud.dev/gcp"
 	"gocloud.dev/pubsub"
@@ -19,10 +18,6 @@ import (
 	"gocloud.dev/pubsub/mempubsub"
 	"gocloud.dev/pubsub/rabbitpubsub"
 )
-
-func init() {
-	cmd.DefaultBrokers["gocloud"] = NewBroker
-}
 
 type (
 	topicOpener func(string) *pubsub.Topic
@@ -146,7 +141,6 @@ func (b *pubsubBroker) Subscribe(topic string, h broker.Handler, opts ...broker.
 		return nil, b.err
 	}
 	options := broker.SubscribeOptions{
-		AutoAck: false,
 		Context: b.options.Context,
 	}
 	for _, o := range opts {
@@ -212,21 +206,13 @@ func (s *subscriber) run(ctx context.Context, h broker.Handler) {
 			log.Printf("Receive returned %v; stopping", err)
 			break
 		}
-		p := &publication{
-			msg: &broker.Message{
-				Header: m.Metadata,
-				Body:   m.Body,
-			},
-			topic: s.topic,
-			ack:   m.Ack,
+		msg := &broker.Message{
+			Header: m.Metadata,
+			Body:   m.Body,
 		}
-		if err := h(p); err != nil {
-			p.err = err
+		if err := h(msg); err != nil {
 			log.Printf("handler returned %v; continuing", err)
 			continue
-		}
-		if s.options.AutoAck {
-			p.Ack()
 		}
 	}
 }

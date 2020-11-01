@@ -11,7 +11,7 @@ import (
 
 	client "go.etcd.io/etcd/clientv3"
 	cc "go.etcd.io/etcd/clientv3/concurrency"
-	"github.com/asim/go-micro/v3/sync"
+	"github.com/asim/nitro/v3/sync"
 )
 
 type etcdSync struct {

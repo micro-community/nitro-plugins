@@ -13,17 +13,16 @@ import (
 	"sync"
 	"time"
 
+	proto "github.com/asim/nitro-plugins/broker/grpc/v3/proto"
+	"github.com/asim/nitro/v3/broker"
+	merr "github.com/asim/nitro/v3/errors"
+	log "github.com/asim/nitro/v3/logger"
+	"github.com/asim/nitro/v3/registry"
+	mreg "github.com/asim/nitro/v3/registry/memory"
+	maddr "github.com/asim/nitro/v3/util/addr"
+	mnet "github.com/asim/nitro/v3/util/net"
+	mls "github.com/asim/nitro/v3/util/tls"
 	"github.com/google/uuid"
-	"github.com/micro/go-micro/v2/broker"
-	"github.com/micro/go-micro/v2/cmd"
-	merr "github.com/micro/go-micro/v2/errors"
-	log "github.com/micro/go-micro/v2/logger"
-	"github.com/micro/go-micro/v2/registry"
-	"github.com/micro/go-micro/v2/registry/cache"
-	maddr "github.com/micro/go-micro/v2/util/addr"
-	mnet "github.com/micro/go-micro/v2/util/net"
-	mls "github.com/micro/go-micro/v2/util/tls"
-	proto "github.com/micro/go-plugins/broker/grpc/v2/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -62,7 +61,7 @@ type grpcEvent struct {
 }
 
 var (
-	registryKey = "github.com/micro/go-micro/v2/registry"
+	registryKey = "github.com/asim/nitro/v3/registry"
 
 	broadcastVersion = "ff.grpc.broadcast"
 	registerTTL      = time.Minute
@@ -71,8 +70,6 @@ var (
 
 func init() {
 	rand.Seed(time.Now().Unix())
-
-	cmd.DefaultBrokers["grpc"] = NewBroker
 }
 
 func newConfig(config *tls.Config) *tls.Config {
@@ -102,7 +99,7 @@ func newGRPCBroker(opts ...broker.Option) broker.Broker {
 	// get registry
 	reg, ok := options.Context.Value(registryKey).(registry.Registry)
 	if !ok {
-		reg = registry.DefaultRegistry
+		reg = mreg.NewRegistry()
 	}
 
 	h := &grpcBroker{
@@ -160,14 +157,12 @@ func (h *grpcHandler) Publish(ctx context.Context, msg *proto.Message) (*proto.E
 		Body:   msg.Body,
 	}
 
-	p := &grpcEvent{m: m, t: msg.Topic}
-
 	h.g.RLock()
 	for _, subscriber := range h.g.subscribers[msg.Topic] {
 		if msg.Id == subscriber.id {
 			// sub is sync; crufty rate limiting
 			// so we don't hose the cpu
-			p.err = subscriber.fn(p)
+			subscriber.fn(m)
 		}
 	}
 	h.g.RUnlock()
@@ -314,10 +309,10 @@ func (h *grpcBroker) Connect() error {
 	// get registry
 	reg, ok := h.opts.Context.Value(registryKey).(registry.Registry)
 	if !ok {
-		reg = registry.DefaultRegistry
+		reg = mreg.NewRegistry()
 	}
 	// set cache
-	h.r = cache.New(reg)
+	h.r = reg
 
 	// set running
 	h.running = true
@@ -334,12 +329,6 @@ func (h *grpcBroker) Disconnect() error {
 
 	h.Lock()
 	defer h.Unlock()
-
-	// stop cache
-	rc, ok := h.r.(cache.Cache)
-	if ok {
-		rc.Stop()
-	}
 
 	// exit and return err
 	ch := make(chan error)
@@ -377,16 +366,11 @@ func (h *grpcBroker) Init(opts ...broker.Option) error {
 	// get registry
 	reg, ok := h.opts.Context.Value(registryKey).(registry.Registry)
 	if !ok {
-		reg = registry.DefaultRegistry
-	}
-
-	// get cache
-	if rc, ok := h.r.(cache.Cache); ok {
-		rc.Stop()
+		reg = mreg.NewRegistry()
 	}
 
 	// set registry
-	h.r = cache.New(reg)
+	h.r = reg
 
 	return nil
 }

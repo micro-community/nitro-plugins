@@ -11,8 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/streadway/amqp"
 
-	"github.com/micro/go-micro/v2/cmd"
-	"github.com/micro/go-micro/v2/transport"
+	"github.com/asim/nitro/v3/transport"
 )
 
 const (
@@ -66,10 +65,6 @@ type rmqtportListener struct {
 var (
 	DefaultTimeout = time.Minute
 )
-
-func init() {
-	cmd.DefaultTransports["rabbitmq"] = NewTransport
-}
 
 func (r *rmqtportClient) Local() string {
 	return r.local

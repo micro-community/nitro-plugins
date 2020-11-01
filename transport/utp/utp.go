@@ -7,8 +7,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/micro/go-micro/v2/cmd"
-	"github.com/micro/go-micro/v2/transport"
+	"github.com/asim/nitro/v3/transport"
 )
 
 type utpTransport struct {
@@ -36,10 +35,6 @@ type utpSocket struct {
 	dec     *gob.Decoder
 	encBuf  *bufio.Writer
 	timeout time.Duration
-}
-
-func init() {
-	cmd.DefaultTransports["utp"] = NewTransport
 }
 
 func NewTransport(opts ...transport.Option) transport.Transport {

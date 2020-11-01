@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/asim/go-micro/v3/logger"
-	"github.com/asim/go-micro/v3/store"
+	"github.com/asim/nitro/v3/logger"
+	"github.com/asim/nitro/v3/store"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 )

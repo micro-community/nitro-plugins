@@ -12,20 +12,15 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
 
-	mnet "github.com/micro/go-micro/v2/util/net"
+	mnet "github.com/asim/nitro/v3/util/net"
 	"github.com/nacos-group/nacos-sdk-go/clients/naming_client"
 
-	"github.com/micro/go-micro/v2/config/cmd"
-	"github.com/micro/go-micro/v2/registry"
+	"github.com/asim/nitro/v3/registry"
 )
 
 type nacosRegistry struct {
 	namingClient naming_client.INamingClient
 	opts         registry.Options
-}
-
-func init() {
-	cmd.DefaultRegistries["nacos"] = NewRegistry
 }
 
 func getNodeIpPort(s *registry.Service) (host string, port int, err error) {

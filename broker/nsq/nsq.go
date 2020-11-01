@@ -9,9 +9,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/micro/go-micro/v2/broker"
-	"github.com/micro/go-micro/v2/cmd"
-	"github.com/micro/go-micro/v2/codec/json"
+	"github.com/asim/nitro/v3/broker"
+	"github.com/asim/nitro/v3/codec/json"
 	"github.com/nsqio/go-nsq"
 )
 
@@ -53,7 +52,6 @@ var (
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
-	cmd.DefaultBrokers["nsq"] = NewBroker
 }
 
 func (n *nsqBroker) Init(opts ...broker.Option) error {
@@ -234,10 +232,7 @@ func (n *nsqBroker) Publish(topic string, message *broker.Message, opts ...broke
 }
 
 func (n *nsqBroker) Subscribe(topic string, handler broker.Handler, opts ...broker.SubscribeOption) (broker.Subscriber, error) {
-	options := broker.SubscribeOptions{
-		AutoAck: true,
-	}
-
+	options := broker.SubscribeOptions{}
 	for _, o := range opts {
 		o(&options)
 	}
@@ -264,19 +259,13 @@ func (n *nsqBroker) Subscribe(topic string, handler broker.Handler, opts ...brok
 	}
 
 	h := nsq.HandlerFunc(func(nm *nsq.Message) error {
-		if !options.AutoAck {
-			nm.DisableAutoResponse()
-		}
-
 		var m broker.Message
 
 		if err := n.opts.Codec.Unmarshal(nm.Body, &m); err != nil {
 			return err
 		}
 
-		p := &publication{topic: topic, m: &m}
-		p.err = handler(p)
-		return p.err
+		return handler(&m)
 	})
 
 	c.AddConcurrentHandlers(h, concurrency)

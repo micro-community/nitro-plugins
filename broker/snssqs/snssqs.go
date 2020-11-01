@@ -16,9 +16,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/aws/aws-sdk-go/service/sts"
-	"github.com/micro/go-micro/v2/broker"
-	"github.com/micro/go-micro/v2/cmd"
-	"github.com/micro/go-micro/v2/logger"
+	"github.com/asim/nitro/v3/broker"
+	"github.com/asim/nitro/v3/logger"
 )
 
 type sessClientKey struct{}
@@ -57,10 +56,6 @@ type sqsEvent struct {
 	URL       string
 	queueName string
 	err       error
-}
-
-func init() {
-	cmd.DefaultBrokers["snssqs"] = NewBroker
 }
 
 // run is designed to run as a goroutine and poll SQS for new messages. Note that it's possible to receive
@@ -135,22 +130,8 @@ func (s *subscriber) handleMessage(msg *sqs.Message, hdlr broker.Handler) {
 		Body:   []byte(*msg.Body),
 	}
 
-	p := &sqsEvent{
-		sMessage:  msg,
-		m:         m,
-		URL:       s.URL,
-		queueName: s.queueName,
-		svc:       s.svc,
-	}
-
-	if p.err = hdlr(p); p.err != nil {
-		fmt.Println(p.err)
-	}
-	if s.options.AutoAck {
-		err := p.Ack()
-		if err != nil {
-			logger.Errorf("Failed auto-acknowledge of message: %s", err.Error())
-		}
+	if err := hdlr(m); err != nil {
+		fmt.Println(err)
 	}
 }
 
@@ -297,7 +278,6 @@ func (b *awsServices) Subscribe(queueName string, h broker.Handler, opts ...brok
 	}
 
 	options := broker.SubscribeOptions{
-		AutoAck: true,
 		Queue:   queueName,
 		Context: context.Background(),
 	}
