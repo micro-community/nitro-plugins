@@ -195,8 +195,7 @@ func (k *kBroker) getSaramaClusterClient(topic string) (sarama.Client, error) {
 
 func (k *kBroker) Subscribe(topic string, handler broker.Handler, opts ...broker.SubscribeOption) (broker.Subscriber, error) {
 	opt := broker.SubscribeOptions{
-		AutoAck: true,
-		Queue:   uuid.New().String(),
+		Queue: uuid.New().String(),
 	}
 	for _, o := range opts {
 		o(&opt)
