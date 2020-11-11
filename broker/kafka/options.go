@@ -24,11 +24,11 @@ func ClusterConfig(c *sarama.Config) broker.Option {
 	return setBrokerOption(clusterConfigKey{}, c)
 }
 
-type autoAckKey struct{}
+type disableAutoAckKey struct{}
 
 // AutoAck will automatically acknowledge messages when no error is returned
-func AutoAck() broker.SubscribeOption {
-	return setSubscribeOption(autoAckKey{}, true)
+func DisableAutoAck() broker.SubscribeOption {
+	return setSubscribeOption(disableAutoAckKey{}, true)
 }
 
 type subscribeContextKey struct{}
@@ -58,7 +58,7 @@ func (*consumerGroupHandler) Setup(_ sarama.ConsumerGroupSession) error   { retu
 func (*consumerGroupHandler) Cleanup(_ sarama.ConsumerGroupSession) error { return nil }
 func (h *consumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for msg := range claim.Messages() {
-		var autoAck bool
+		autoAck := true
 		var m broker.Message
 		p := &publication{m: &m, t: msg.Topic, km: msg, cg: h.cg, sess: sess}
 		eh := h.erropt
@@ -76,8 +76,8 @@ func (h *consumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, cl
 
 		err := h.handler(p.m)
 		ctx := h.kopts.Context
-		if bval, ok := ctx.Value(autoAckKey{}).(bool); ok && bval {
-			autoAck = true
+		if bval, ok := ctx.Value(disableAutoAckKey{}).(bool); ok && bval {
+			autoAck = false
 		}
 		if err == nil && autoAck {
 			sess.MarkMessage(msg, "")
