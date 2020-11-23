@@ -9,6 +9,8 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/asim/nitro/v3/broker"
+	"github.com/asim/nitro/v3/logger"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -16,8 +18,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/aws/aws-sdk-go/service/sts"
-	"github.com/asim/nitro/v3/broker"
-	"github.com/asim/nitro/v3/logger"
 )
 
 type sessClientKey struct{}
@@ -130,7 +130,19 @@ func (s *subscriber) handleMessage(msg *sqs.Message, hdlr broker.Handler) {
 		Body:   []byte(*msg.Body),
 	}
 
-	if err := hdlr(m); err != nil {
+	if ct, ok := m.Header["Content-Type"]; !ok || len(ct) == 0 {
+		m.Header["Content-Type"] = "application/grpc+json"
+	}
+
+	p := &sqsEvent{
+		sMessage:  msg,
+		m:         m,
+		URL:       s.URL,
+		queueName: s.queueName,
+		svc:       s.svc,
+	}
+
+	if err := hdlr(p); err != nil {
 		fmt.Println(err)
 	}
 }
